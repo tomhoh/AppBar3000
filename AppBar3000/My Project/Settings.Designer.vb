@@ -53,42 +53,6 @@ Namespace My
                 Return defaultInstance
             End Get
         End Property
-        
-        <Global.System.Configuration.UserScopedSettingAttribute(),  _
-         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("0")>  _
-        Public Property AppBarPosition() As Integer
-            Get
-                Return CType(Me("AppBarPosition"),Integer)
-            End Get
-            Set
-                Me("AppBarPosition") = value
-            End Set
-        End Property
-        
-        <Global.System.Configuration.UserScopedSettingAttribute(),  _
-         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("0")>  _
-        Public Property MonNum() As String
-            Get
-                Return CType(Me("MonNum"),String)
-            End Get
-            Set
-                Me("MonNum") = value
-            End Set
-        End Property
-        
-        <Global.System.Configuration.UserScopedSettingAttribute(),  _
-         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("75")>  _
-        Public Property AppBarSize() As String
-            Get
-                Return CType(Me("AppBarSize"),String)
-            End Get
-            Set
-                Me("AppBarSize") = value
-            End Set
-        End Property
     End Class
 End Namespace
 

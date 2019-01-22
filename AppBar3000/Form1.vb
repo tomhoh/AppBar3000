@@ -5,6 +5,7 @@ Public Class AppBar3000
     Public MonNum As Integer
     Public AppBarPosition As Integer
     Public AppBarSize As Integer
+    Public DisNum As Integer
 
     Private Structure RECT
         Public left As Integer
@@ -108,42 +109,45 @@ Public Class AppBar3000
 
     Private Sub Form1_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
 
-        CheckSettings()
+        RegSettings()
         Me.FormBorderStyle = FormBorderStyle.FixedToolWindow
-        AppBarPosition = My.Settings.AppBarPosition
         RegisterBar()
         Me.Invalidate()
     End Sub
 
-    Public Sub SaveSettings()
-        My.Settings.AppBarPosition = AppBarPosition
-        My.Settings.MonNum = MonNum
-        My.Settings.AppBarSize = AppBarSize
-        My.Settings.Save()
-    End Sub
+    Public Sub RegSettings()
+        Dim RegAppBarPosition = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\Software\AbbBar3000", "AppBarPosition", Nothing)
+        Dim RegAppBarSize = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\Software\AbbBar3000", "AppBarSize", Nothing)
+        Dim RegMonNum = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\Software\AbbBar3000", "MonNum", Nothing)
+        Dim RegDisNum = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\Software\AbbBar3000", "DisNum", Nothing)
 
-    Public Sub CheckSettings()
-        Dim directory As String = AppDomain.CurrentDomain.BaseDirectory + "AppBar3000_exe.config"
-        If File.Exists(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile) Then
-            LoadSettings()
-            MsgBox(directory)
-        Else
+        If RegAppBarPosition = "" Then
+            My.Computer.Registry.SetValue("HKEY_CURRENT_USER\Software\AbbBar3000", "AppBarPosition", "0")
             AppBarPosition = 0
-            MonNum = 0
-            AppBarSize = 75
-            My.Computer.FileSystem.CopyFile(My.Resources.AppBar3000_exe, directory)
-            My.Settings.AppBarPosition = 0
-            My.Settings.MonNum = 0
-            My.Settings.AppBarSize = 75
-            My.Settings.Save()
-            LoadSettings()
+        Else
+            AppBarPosition = RegAppBarPosition
         End If
-    End Sub
 
-    Public Sub LoadSettings()
-        AppBarPosition = My.Settings.AppBarPosition
-        MonNum = My.Settings.MonNum
-        AppBarSize = My.Settings.AppBarSize
+        If RegAppBarSize = "" Then
+            My.Computer.Registry.SetValue("HKEY_CURRENT_USER\Software\AbbBar3000", "AppBarSize", "0")
+            AppBarSize = 75
+        Else
+            AppBarSize = RegAppBarSize
+        End If
+
+        If RegMonNum = "" Then
+            My.Computer.Registry.SetValue("HKEY_CURRENT_USER\Software\AbbBar3000", "MonNum", "0")
+            MonNum = 0
+        Else
+            MonNum = RegMonNum
+        End If
+
+        If RegDisNum = "" Then
+            My.Computer.Registry.SetValue("HKEY_CURRENT_USER\Software\AbbBar3000", "DisNum", "0")
+            DisNum = 1
+        Else
+            DisNum = RegDisNum
+        End If
     End Sub
 
     Private Sub RegisterBar()
@@ -169,6 +173,48 @@ Public Class AppBar3000
         Dim abd As New APPBARDATA()
         abd.cbSize = Marshal.SizeOf(abd)
         abd.hWnd = Me.Handle
+
+        'Set MonNum Value
+        If DisNum = 1 Then  'MonNum should be 0
+            If MonNum = 1 Or 2 Then
+                fBarRegistered = True
+                RegisterBar()
+            End If
+        ElseIf DisNum = 2 Then  'MonNum should be 1
+            If MonNum = 0 Or 2 Then
+                fBarRegistered = True
+                RegisterBar()
+            End If
+        ElseIf DisNum = 3 Then  'MonNum should be 2
+            If MonNum = 0 Or 1 Then
+                fBarRegistered = True
+                RegisterBar()
+            End If
+        End If
+
+        RegisterBar()
+
+        'Locate Num of Monitors
+        If SystemInformation.MonitorCount = 1 Then
+            DisNum = 1
+            MonNum = 0
+        ElseIf SystemInformation.MonitorCount = 2 Then
+            If DisNum = 1 Then
+                MonNum = 0
+            ElseIf DisNum = 2 Then
+                MonNum = 1
+            ElseIf DisNum = 3 Then
+                MonNum = 2
+            End If
+        ElseIf SystemInformation.MonitorCount = 3 Then
+            If DisNum = 1 Then
+                MonNum = 0
+            ElseIf DisNum = 2 Then
+                MonNum = 1
+            ElseIf DisNum = 3 Then
+                MonNum = 2
+            End If
+        End If
 
         If AppBarPosition = 0 Then
             'Me.AutoScaleBaseSize = New Size(5, 13)
@@ -250,7 +296,6 @@ Public Class AppBar3000
                     Exit Select
             End Select
         End If
-
         MyBase.WndProc(m)
     End Sub
 

@@ -61,20 +61,6 @@ Namespace My.Resources
         End Property
         
         '''<summary>
-        '''  Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt;
-        '''&lt;configuration&gt;
-        '''    &lt;configSections&gt;
-        '''        &lt;sectionGroup name=&quot;userSettings&quot; type=&quot;System.Configuration.UserSettingsGroup, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089&quot; &gt;
-        '''            &lt;section name=&quot;AppBar3000.My.MySettings&quot; type=&quot;System.Configuration.ClientSettingsSection, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089&quot; allowExeDefinition=&quot;MachineToLocalUser&quot; requirePermission=&quot;false&quot; /&gt;
-        '''        &lt;/sectionG [rest of string was truncated]&quot;;.
-        '''</summary>
-        Friend ReadOnly Property AppBar3000_exe() As String
-            Get
-                Return ResourceManager.GetString("AppBar3000_exe", resourceCulture)
-            End Get
-        End Property
-        
-        '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
         Friend ReadOnly Property Gear() As System.Drawing.Bitmap
