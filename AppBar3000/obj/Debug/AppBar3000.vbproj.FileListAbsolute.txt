@@ -1,0 +1,13 @@
+C:\Users\oslin\source\repos\AppBar3000\AppBar3000\obj\Debug\AppBar3000.Resources.resources
+C:\Users\oslin\source\repos\AppBar3000\AppBar3000\obj\Debug\AppBar3000.vbproj.GenerateResource.cache
+C:\Users\oslin\source\repos\AppBar3000\AppBar3000\obj\Debug\AppBar3000.vbproj.CoreCompileInputs.cache
+C:\Users\oslin\source\repos\AppBar3000\AppBar3000\bin\Debug\AppBar3000.exe.config
+C:\Users\oslin\source\repos\AppBar3000\AppBar3000\bin\Debug\AppBar3000.exe
+C:\Users\oslin\source\repos\AppBar3000\AppBar3000\bin\Debug\AppBar3000.pdb
+C:\Users\oslin\source\repos\AppBar3000\AppBar3000\bin\Debug\AppBar3000.xml
+C:\Users\oslin\source\repos\AppBar3000\AppBar3000\obj\Debug\AppBar3000.exe
+C:\Users\oslin\source\repos\AppBar3000\AppBar3000\obj\Debug\AppBar3000.xml
+C:\Users\oslin\source\repos\AppBar3000\AppBar3000\obj\Debug\AppBar3000.pdb
+C:\Users\oslin\source\repos\AppBar3000\AppBar3000\obj\Debug\AppBar3000.AppBar3000.resources
+C:\Users\oslin\source\repos\AppBar3000\AppBar3000\obj\Debug\AppBar3000.Settings.resources
+C:\Users\oslin\source\repos\AppBar3000\AppBar3000\obj\Debug\AppBar3000.vbprojAssemblyReference.cache
