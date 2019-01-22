@@ -112,6 +112,7 @@ Public Class AppBar3000
         RegSettings()
         Me.FormBorderStyle = FormBorderStyle.FixedToolWindow
         RegisterBar()
+        ABSetPos()
         Me.Invalidate()
     End Sub
 
@@ -143,7 +144,7 @@ Public Class AppBar3000
         End If
 
         If RegDisNum = "" Then
-            My.Computer.Registry.SetValue("HKEY_CURRENT_USER\Software\AbbBar3000", "DisNum", "0")
+            My.Computer.Registry.SetValue("HKEY_CURRENT_USER\Software\AbbBar3000", "DisNum", "1")
             DisNum = 1
         Else
             DisNum = RegDisNum
@@ -174,26 +175,6 @@ Public Class AppBar3000
         abd.cbSize = Marshal.SizeOf(abd)
         abd.hWnd = Me.Handle
 
-        'Set MonNum Value
-        If DisNum = 1 Then  'MonNum should be 0
-            If MonNum = 1 Or 2 Then
-                fBarRegistered = True
-                RegisterBar()
-            End If
-        ElseIf DisNum = 2 Then  'MonNum should be 1
-            If MonNum = 0 Or 2 Then
-                fBarRegistered = True
-                RegisterBar()
-            End If
-        ElseIf DisNum = 3 Then  'MonNum should be 2
-            If MonNum = 0 Or 1 Then
-                fBarRegistered = True
-                RegisterBar()
-            End If
-        End If
-
-        RegisterBar()
-
         'Locate Num of Monitors
         If SystemInformation.MonitorCount = 1 Then
             DisNum = 1
@@ -203,8 +184,6 @@ Public Class AppBar3000
                 MonNum = 0
             ElseIf DisNum = 2 Then
                 MonNum = 1
-            ElseIf DisNum = 3 Then
-                MonNum = 2
             End If
         ElseIf SystemInformation.MonitorCount = 3 Then
             If DisNum = 1 Then
@@ -217,23 +196,19 @@ Public Class AppBar3000
         End If
 
         If AppBarPosition = 0 Then
-            'Me.AutoScaleBaseSize = New Size(5, 13)
-            'Me.ClientSize = New Size(75, 75)
+            Me.AutoScaleBaseSize = New Size(5, 13)
             abd.uEdge = CInt(ABEdge.ABE_TOP)
             SettingsPB.Location = New Point(Screen.AllScreens(MonNum).WorkingArea.Width - 62.5, 12.5)
         ElseIf AppBarPosition = 1 Then
-            'Me.AutoScaleBaseSize = New Size(5, 13)
-            'Me.ClientSize = New Size(75, 75)
+            Me.AutoScaleBaseSize = New Size(5, 13)
             abd.uEdge = CInt(ABEdge.ABE_BOTTOM)
             SettingsPB.Location = New Point(Screen.AllScreens(MonNum).WorkingArea.Width - 62.5, 12.5)
         ElseIf AppBarPosition = 2 Then
-            'Me.AutoScaleBaseSize = New Size(5, 13)
-            'Me.ClientSize = New Size(75, 75)
+            Me.AutoScaleBaseSize = New Size(5, 13)
             abd.uEdge = CInt(ABEdge.ABE_LEFT)
             SettingsPB.Location = New Point(12.5, Screen.AllScreens(MonNum).WorkingArea.Height - 62.5)
         ElseIf AppBarPosition = 3 Then
-            'Me.AutoScaleBaseSize = New Size(5, 13)
-            'Me.ClientSize = New Size(75, 75)
+            Me.AutoScaleBaseSize = New Size(5, 13)
             abd.uEdge = CInt(ABEdge.ABE_RIGHT)
             SettingsPB.Location = New Point(12.5, Screen.AllScreens(MonNum).WorkingArea.Height - 62.5)
         End If

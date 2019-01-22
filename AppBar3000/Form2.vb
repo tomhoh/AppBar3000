@@ -84,7 +84,6 @@ Public Class Settings
     End Sub
 
     Private Sub AppBarPositionCB_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AppBarPositionCB.SelectedIndexChanged
-        MsgBox(AppBarPositionCB.SelectedIndex)
     End Sub
 
     Private Sub Settings_Load(sender As Object, e As EventArgs) Handles MyBase.Load
