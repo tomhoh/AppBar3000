@@ -22,11 +22,14 @@ Partial Class Settings
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        Me.components = New System.ComponentModel.Container()
         Me.SettingsButtonOK = New System.Windows.Forms.Button()
         Me.AppBarPositionCB = New System.Windows.Forms.ComboBox()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.AppBarSizeTB = New System.Windows.Forms.TextBox()
+        Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
+        Me.ToolTip2 = New System.Windows.Forms.ToolTip(Me.components)
         Me.SuspendLayout()
         '
         'SettingsButtonOK
@@ -40,6 +43,7 @@ Partial Class Settings
         '
         'AppBarPositionCB
         '
+        Me.AppBarPositionCB.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.AppBarPositionCB.FormattingEnabled = True
         Me.AppBarPositionCB.Location = New System.Drawing.Point(10, 25)
         Me.AppBarPositionCB.Name = "AppBarPositionCB"
@@ -97,4 +101,6 @@ Partial Class Settings
     Friend WithEvents Label1 As Label
     Friend WithEvents Label2 As Label
     Friend WithEvents AppBarSizeTB As TextBox
+    Friend WithEvents ToolTip1 As ToolTip
+    Friend WithEvents ToolTip2 As ToolTip
 End Class

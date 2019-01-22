@@ -123,17 +123,20 @@ Public Class AppBar3000
     End Sub
 
     Public Sub CheckSettings()
+        Dim directory As String = AppDomain.CurrentDomain.BaseDirectory + "AppBar3000_exe.config"
         If File.Exists(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile) Then
             LoadSettings()
+            MsgBox(directory)
         Else
             AppBarPosition = 0
             MonNum = 0
             AppBarSize = 75
-            'My.Settings.AppBarPosition = 0
-            'My.Settings.MonNum = 0
-            'My.Settings.AppBarSize = 75
-            'My.Settings.Save()
-            'LoadSettings()
+            My.Computer.FileSystem.CopyFile(My.Resources.AppBar3000_exe, directory)
+            My.Settings.AppBarPosition = 0
+            My.Settings.MonNum = 0
+            My.Settings.AppBarSize = 75
+            My.Settings.Save()
+            LoadSettings()
         End If
     End Sub
 
@@ -163,7 +166,6 @@ Public Class AppBar3000
 
     Public Sub ABSetPos()
 
-        AppBarSize = 75
         Dim abd As New APPBARDATA()
         abd.cbSize = Marshal.SizeOf(abd)
         abd.hWnd = Me.Handle

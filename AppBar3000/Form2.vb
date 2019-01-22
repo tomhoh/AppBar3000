@@ -6,10 +6,15 @@
 ' 8 = Top, 9 = Bottom, 10 = Left, 11 = Right
 
 
+Imports System.Text.RegularExpressions
+
 Public Class Settings
 
     Private Sub SettingsButtonOK_Click(sender As Object, e As EventArgs) Handles SettingsButtonOK.Click
         Me.Visible = False
+        If AppBarSizeTB.Text = "" Then
+            AppBarSizeTB.Text = "75"
+        End If
         AppBar3000.AppBarSize = AppBarSizeTB.Text
         AppBar3000.ABSetPos()
     End Sub
@@ -26,6 +31,15 @@ Public Class Settings
             End If
         End If
 
+    End Sub
+
+    Private Sub AppBarSizeTB_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles AppBarSizeTB.TextChanged
+        Dim digitsOnly As Regex = New Regex("[^\d]")
+        AppBarSizeTB.Text = digitsOnly.Replace(AppBarSizeTB.Text, "")
+    End Sub
+
+    Private Sub AppBarSizeTB_MouseMoved(ByVal sender As Object, ByVal e As System.EventArgs) Handles AppBarSizeTB.MouseMove
+        ToolTip2.SetToolTip(AppBarSizeTB, "Please Enter Numbers Only")
     End Sub
 
     Private Sub AppBarPositionCB_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AppBarPositionCB.SelectedIndexChanged
