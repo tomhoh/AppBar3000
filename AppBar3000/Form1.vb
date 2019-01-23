@@ -1,4 +1,5 @@
-﻿Imports System.Runtime.InteropServices
+﻿Imports System.IO
+Imports System.Runtime.InteropServices
 
 Public Class AppBar3000
     Public MonNum As Integer
@@ -56,6 +57,8 @@ Public Class AppBar3000
     (ByVal dwMessage As Integer, <MarshalAs(UnmanagedType.Struct)> ByRef pData As _
     APPBARDATA) As IntPtr
 
+    Private Declare Function LockWorkStation Lib "user32.dll" Alias "LockWorkStation" () As Boolean
+
     Private Declare Function GetSystemMetrics Lib "user32" Alias "GetSystemMetrics" _
     (ByVal nIndex As Integer) As Integer
 
@@ -70,49 +73,90 @@ Public Class AppBar3000
 
     Dim icons As Integer = 0
 
-    Private Sub Form1_DragDrop(ByVal sender As Object, ByVal e As DragEventArgs) Handles Me.DragDrop
-        If e.Data.GetDataPresent(DataFormats.FileDrop) Then
-            Dim files() As String = DirectCast(e.Data.GetData(DataFormats.FileDrop, False), String())
-            For Each file As String In files
-                Dim pb As New PictureBox With {
-                    .Size = New Size(32, 32),
-                    .Location = New Point(12 + (icons * 44), 12),
-                    .Tag = file
-                }
-                Dim icon As Icon = Icon.ExtractAssociatedIcon(file)
-                pb.Image = icon.ToBitmap
-                pb.Cursor = Cursors.Hand
-                AddHandler pb.DoubleClick, AddressOf PictureBox1_DoubleClick
-                ToolTip1.SetToolTip(pb, file)
-                Me.Controls.Add(pb)
-                icons += 1
-            Next
+    Protected Overrides Function ProcessCmdKey(ByRef msg As Message, ByVal keyData As Keys) As Boolean
+        Select Case keyData
+            Case Keys.F12
+                LockWorkStation()
+        End Select
+        Return 0
+    End Function
+
+    Public Function ExtractResourceToDisk(ByVal ResourceName As String, ByVal FileToExtractTo As String) As Boolean
+
+        Dim s As Stream = Reflection.Assembly.GetExecutingAssembly.GetManifestResourceStream(ResourceName)
+        Dim ResourceFile As New FileStream(FileToExtractTo, FileMode.Create)
+
+        Dim b(s.Length) As Byte
+
+        s.Read(b, 0, s.Length)
+        ResourceFile.Write(b, 0, b.Length - 1)
+        ResourceFile.Flush()
+        ResourceFile.Close()
+
+        ResourceFile = Nothing
+        Return 0
+    End Function
+
+    Protected Overloads Overrides Sub WndProc(ByRef m As Message)
+        If m.Msg = uCallBack Then
+            Select Case m.WParam.ToInt32()
+                Case CInt(ABNotify.ABN_POSCHANGED)
+                    ABSetPos()
+                    Exit Select
+            End Select
         End If
+        MyBase.WndProc(m)
     End Sub
 
-    Private Sub PictureBox1_DoubleClick(ByVal sender As Object, ByVal e As EventArgs)
-        Process.Start(DirectCast(sender, PictureBox).Tag.ToString)
-    End Sub
-
-    Private Sub Form1_DragOver(ByVal sender As Object, ByVal e As DragEventArgs) Handles Me.DragOver
-        If e.Data.GetDataPresent(DataFormats.FileDrop) Then
-            e.Effect = DragDropEffects.Copy
-        Else
-            e.Effect = DragDropEffects.None
-        End If
-    End Sub
-
-    Private Sub Form1_FormClosing(ByVal sender As Object, ByVal e As FormClosingEventArgs) Handles Me.FormClosing
-        RegisterBar()
-    End Sub
+    'Protected Overloads Overrides ReadOnly Property CreateParams() As System.Windows.Forms.CreateParams
+    'Get
+    'Dim cp As CreateParams = MyBase.CreateParams
+    '       cp.Style = cp.Style And (Not 12582912)
+    '      WS_CAPTION
+    '     cp.Style = cp.Style And (Not 8388608)
+    '     WS_BORDER
+    '   cp.ExStyle = 128 Or 8
+    ' WS_EX_TOOLWINDOW | WS_EX_TOPMOST
+    'Return cp
+    'End Get
+    'End Property
 
     Private Sub Form1_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
 
-        RegSettings()
+        'RegSettings()
+        CheckSettings()
         Me.FormBorderStyle = FormBorderStyle.FixedToolWindow
+        PictureBox1.Location = New Point(12.5, 12.5)
         RegisterBar()
         ABSetPos()
         Me.Invalidate()
+    End Sub
+
+    Public Sub CheckSettings()
+        Dim directory As String = AppDomain.CurrentDomain.BaseDirectory + "AppBar3000.exe.config"
+        If File.Exists(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile) Then
+            LoadSettings()
+        Else
+            ExtractResourceToDisk(My.Resources.AppBar3000Config, directory)
+            LoadSettings()
+        End If
+    End Sub
+
+    Public Sub LoadSettings()
+        AppBarPosition = My.Settings.AppBarPosition
+        MonNum = My.Settings.MonNum
+        AppBarSize = My.Settings.AppBarSize
+        DisNum = My.Settings.DisNum
+    End Sub
+
+    Public Sub SaveSettings()
+
+        My.Settings.AppBarPosition = AppBarPosition
+        My.Settings.AppBarSize = AppBarSize
+        My.Settings.MonNum = MonNum
+        My.Settings.DisNum = DisNum
+        My.Settings.Save()
+
     End Sub
 
     Public Sub RegSettings()
@@ -136,7 +180,7 @@ Public Class AppBar3000
         End If
 
         If RegMonNum = "" Then
-            My.Computer.Registry.SetValue("HKEY_CURRENT_USER\Software\AbbBar3000", "MonNum", "1")
+            My.Computer.Registry.SetValue("HKEY_CURRENT_USER\Software\AbbBar3000", "MonNum", "0")
             MonNum = 0
         Else
             MonNum = RegMonNum
@@ -195,21 +239,13 @@ Public Class AppBar3000
         End If
 
         If AppBarPosition = 0 Then
-            Me.AutoScaleBaseSize = New Size(5, 13)
             abd.uEdge = CInt(ABEdge.ABE_TOP)
-            SettingsPB.Location = New Point(Screen.AllScreens(MonNum).WorkingArea.Width - 62.5, 12.5)
         ElseIf AppBarPosition = 1 Then
-            Me.AutoScaleBaseSize = New Size(5, 13)
             abd.uEdge = CInt(ABEdge.ABE_BOTTOM)
-            SettingsPB.Location = New Point(Screen.AllScreens(MonNum).WorkingArea.Width - 62.5, 12.5)
         ElseIf AppBarPosition = 2 Then
-            Me.AutoScaleBaseSize = New Size(5, 13)
             abd.uEdge = CInt(ABEdge.ABE_LEFT)
-            SettingsPB.Location = New Point(12.5, Screen.AllScreens(MonNum).WorkingArea.Height - 62.5)
         ElseIf AppBarPosition = 3 Then
-            Me.AutoScaleBaseSize = New Size(5, 13)
             abd.uEdge = CInt(ABEdge.ABE_RIGHT)
-            SettingsPB.Location = New Point(12.5, Screen.AllScreens(MonNum).WorkingArea.Height - 62.5)
         End If
 
         If abd.uEdge = CInt(ABEdge.ABE_RIGHT) Then
@@ -262,49 +298,95 @@ Public Class AppBar3000
         ' Move and size the appbar so that it conforms to the 
         ' bounding rectangle passed to the system. 
         MoveWindow(abd.hWnd, abd.rc.left, abd.rc.top, abd.rc.right - abd.rc.left, abd.rc.bottom - abd.rc.top, True)
+
+        SettingsLoc()
+
     End Sub
 
-    Protected Overloads Overrides Sub WndProc(ByRef m As Message)
-        If m.Msg = uCallBack Then
-            Select Case m.WParam.ToInt32()
-                Case CInt(ABNotify.ABN_POSCHANGED)
-                    ABSetPos()
-                    Exit Select
-            End Select
+    Private Sub SettingsLoc()
+        If AppBarPosition = 0 Then
+            'SettingsPB.Location = New Point(Screen.AllScreens(MonNum).WorkingArea.Width - 62.5, 12.5)
+            SettingsPB.Location = New Point(Me.Size.Width - 62.5, 12.5)
+            FlowLayoutPanel1.Location = New Point(0, 0)
+            FlowLayoutPanel1.Size = New Point(Me.Size.Width - 75, AppBarSize)
+            FlowLayoutPanel1.FlowDirection = FlowDirection.LeftToRight
+        ElseIf AppBarPosition = 1 Then
+            'SettingsPB.Location = New Point(Screen.AllScreens(MonNum).WorkingArea.Width - 62.5, 12.5)
+            SettingsPB.Location = New Point(Me.Size.Width - 62.5, 12.5)
+            FlowLayoutPanel1.Location = New Point(0, 0)
+            FlowLayoutPanel1.Size = New Point(Me.Size.Width - 75, AppBarSize)
+            FlowLayoutPanel1.FlowDirection = FlowDirection.LeftToRight
+        ElseIf AppBarPosition = 2 Then
+            'SettingsPB.Location = New Point(12.5, Screen.AllScreens(MonNum).WorkingArea.Height - 62.5)
+            SettingsPB.Location = New Point(12.5, Me.Size.Height - 62.5)
+            FlowLayoutPanel1.Location = New Point(0, 0)
+            FlowLayoutPanel1.Size = New Point(AppBarSize, Me.Size.Height - 75)
+            FlowLayoutPanel1.FlowDirection = FlowDirection.TopDown
+        ElseIf AppBarPosition = 3 Then
+            'SettingsPB.Location = New Point(12.5, Screen.AllScreens(MonNum).WorkingArea.Height - 62.5)
+            SettingsPB.Location = New Point(12.5, Me.Size.Height - 62.5)
+            FlowLayoutPanel1.Location = New Point(0, 0)
+            FlowLayoutPanel1.Size = New Point(AppBarSize, Me.Size.Height - 75)
+            FlowLayoutPanel1.FlowDirection = FlowDirection.TopDown
         End If
-        MyBase.WndProc(m)
     End Sub
 
-    Protected Overloads Overrides ReadOnly Property CreateParams() As System.Windows.Forms.CreateParams
-        Get
-            Dim cp As CreateParams = MyBase.CreateParams
-            cp.Style = cp.Style And (Not 12582912)
-            ' WS_CAPTION
-            cp.Style = cp.Style And (Not 8388608)
-            ' WS_BORDER
-            cp.ExStyle = 128 Or 8
-            ' WS_EX_TOOLWINDOW | WS_EX_TOPMOST
-            Return cp
-        End Get
-    End Property
+    Private Sub Form1_DragDrop(ByVal sender As Object, ByVal e As DragEventArgs) Handles Me.DragDrop
+        If e.Data.GetDataPresent(DataFormats.FileDrop) Then
+            Dim files() As String = DirectCast(e.Data.GetData(DataFormats.FileDrop, False), String())
+            MsgBox(files)
+            For Each file As String In files
+                Dim pb As New PictureBox With {
+                    .Size = New Size(32, 32),
+                    .Location = New Point(12 + (icons * 44), 12),
+                    .Tag = file
+                }
+                Dim icon As Icon = Icon.ExtractAssociatedIcon(file)
+                pb.Image = icon.ToBitmap
+                pb.Cursor = Cursors.Hand
+                AddHandler pb.DoubleClick, AddressOf PictureBox1_DoubleClick
+                ToolTip1.SetToolTip(pb, file)
+                Me.Controls.Add(pb)
+                icons += 1
+            Next
+        End If
+    End Sub
 
-    Private Sub Form1_Doubleclick() Handles MyBase.DoubleClick
-        Dim abd As New APPBARDATA
-        fBarRegistered = True
-        RegisterBar()
-        Me.Close()
+    Private Sub PictureBox1_DoubleClick(ByVal sender As Object, ByVal e As EventArgs)
+        Process.Start(DirectCast(sender, PictureBox).Tag.ToString)
+    End Sub
+
+    Private Sub Form1_DragOver(ByVal sender As Object, ByVal e As DragEventArgs) Handles Me.DragOver
+        If e.Data.GetDataPresent(DataFormats.FileDrop) Then
+            e.Effect = DragDropEffects.Copy
+        Else
+            e.Effect = DragDropEffects.None
+        End If
     End Sub
 
     Private Sub SettingsPB_Click(sender As Object, e As EventArgs) Handles SettingsPB.Click
+
         Settings.Visible = True
+
     End Sub
 
-    Protected Overrides Function ProcessCmdKey(ByRef msg As Message, ByVal keyData As Keys) As Boolean
-        Select Case keyData
-            Case Keys.F12
-                Settings.Visible = True
-        End Select
-        Return 0
-    End Function
+    Private Sub FlowLayoutPanel1_DoubleClick() Handles MyBase.DoubleClick
+
+        Me.Close()
+
+    End Sub
+    Private Sub Form1_Doubleclick() Handles MyBase.DoubleClick
+
+        Me.Close()
+
+    End Sub
+
+    Private Sub Form1_FormClosing(ByVal sender As Object, ByVal e As FormClosingEventArgs) Handles Me.FormClosing
+
+        fBarRegistered = True
+        RegisterBar()
+        SaveSettings()
+
+    End Sub
 
 End Class

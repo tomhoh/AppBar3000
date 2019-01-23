@@ -150,6 +150,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\AppBar3000.exe.config" />
     <None Include="Resources\Gear.jpg" />
   </ItemGroup>
   <ItemGroup>
