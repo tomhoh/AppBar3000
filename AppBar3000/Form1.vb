@@ -1,5 +1,4 @@
-﻿Imports System.IO
-Imports System.Runtime.InteropServices
+﻿Imports System.Runtime.InteropServices
 
 Public Class AppBar3000
     Public MonNum As Integer
@@ -299,4 +298,13 @@ Public Class AppBar3000
     Private Sub SettingsPB_Click(sender As Object, e As EventArgs) Handles SettingsPB.Click
         Settings.Visible = True
     End Sub
+
+    Protected Overrides Function ProcessCmdKey(ByRef msg As Message, ByVal keyData As Keys) As Boolean
+        Select Case keyData
+            Case Keys.F12
+                Settings.Visible = True
+        End Select
+        Return 0
+    End Function
+
 End Class
