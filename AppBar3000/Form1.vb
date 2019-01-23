@@ -45,10 +45,10 @@ Public Class AppBar3000
     End Enum
 
     Private Enum ABEdge As Integer
-        ABE_LEFT = 0
-        ABE_TOP = 1
-        ABE_RIGHT = 2
-        ABE_BOTTOM = 3
+        ABE_LEFT = &H0
+        ABE_TOP = &H1
+        ABE_RIGHT = &H2
+        ABE_BOTTOM = &H3
     End Enum
 
     Private fBarRegistered As Boolean = False
@@ -130,14 +130,14 @@ Public Class AppBar3000
         End If
 
         If RegAppBarSize = "" Then
-            My.Computer.Registry.SetValue("HKEY_CURRENT_USER\Software\AbbBar3000", "AppBarSize", "0")
+            My.Computer.Registry.SetValue("HKEY_CURRENT_USER\Software\AbbBar3000", "AppBarSize", "75")
             AppBarSize = 75
         Else
             AppBarSize = RegAppBarSize
         End If
 
         If RegMonNum = "" Then
-            My.Computer.Registry.SetValue("HKEY_CURRENT_USER\Software\AbbBar3000", "MonNum", "0")
+            My.Computer.Registry.SetValue("HKEY_CURRENT_USER\Software\AbbBar3000", "MonNum", "1")
             MonNum = 0
         Else
             MonNum = RegMonNum
@@ -154,7 +154,7 @@ Public Class AppBar3000
     Private Sub RegisterBar()
         Dim abd As New APPBARDATA
         abd.cbSize = Marshal.SizeOf(abd)
-        abd.hWnd = Me.Handle
+        abd.hWnd = Handle
         If Not fBarRegistered Then
             uCallBack = RegisterWindowMessage("AppBarMessage")
             abd.uCallbackMessage = uCallBack
@@ -213,27 +213,29 @@ Public Class AppBar3000
             SettingsPB.Location = New Point(12.5, Screen.AllScreens(MonNum).WorkingArea.Height - 62.5)
         End If
 
-        If abd.uEdge = CInt(ABEdge.ABE_LEFT) OrElse abd.uEdge = CInt(ABEdge.ABE_RIGHT) Then
-            abd.rc.top = 0
-            abd.rc.bottom = SystemInformation.PrimaryMonitorSize.Height
-            If abd.uEdge = CInt(ABEdge.ABE_LEFT) Then
-                abd.rc.left = 0
-                abd.rc.right = AppBarSize
-            Else
-                abd.rc.right = SystemInformation.PrimaryMonitorSize.Width
-                abd.rc.left = abd.rc.right - AppBarSize
-            End If
-        Else
-            abd.rc.left = 0
-            abd.rc.right = SystemInformation.PrimaryMonitorSize.Width
-            If abd.uEdge = CInt(ABEdge.ABE_TOP) Then
-                abd.rc.top = 0
-                abd.rc.bottom = AppBarSize
-            Else
-                abd.rc.bottom = SystemInformation.PrimaryMonitorSize.Height
-                abd.rc.top = abd.rc.bottom - AppBarSize
-            End If
+        If abd.uEdge = CInt(ABEdge.ABE_RIGHT) Then
+            abd.rc.top = Screen.AllScreens(MonNum).Bounds.Top
+            abd.rc.left = Screen.AllScreens(MonNum).Bounds.Right - AppBarSize
+            abd.rc.right = Screen.AllScreens(MonNum).Bounds.Right
+            abd.rc.bottom = Screen.AllScreens(MonNum).Bounds.Height
+        ElseIf abd.uEdge = CInt(ABEdge.ABE_LEFT) Then
+            abd.rc.top = Screen.AllScreens(MonNum).Bounds.Top
+            abd.rc.left = Screen.AllScreens(MonNum).Bounds.Left
+            abd.rc.right = Screen.AllScreens(MonNum).Bounds.Right + AppBarSize
+            abd.rc.bottom = Screen.AllScreens(MonNum).Bounds.Height
+        ElseIf abd.uEdge = CInt(ABEdge.ABE_TOP) Then
+            abd.rc.top = Screen.AllScreens(MonNum).Bounds.Top
+            abd.rc.left = Screen.AllScreens(MonNum).Bounds.Left
+            abd.rc.right = Screen.AllScreens(MonNum).Bounds.Right
+            abd.rc.bottom = Screen.AllScreens(MonNum).Bounds.Top + AppBarSize
+        ElseIf abd.uEdge = CInt(ABEdge.ABE_BOTTOM) Then
+            abd.rc.top = Screen.AllScreens(MonNum).Bounds.Bottom - AppBarSize
+            abd.rc.left = Screen.AllScreens(MonNum).Bounds.Left
+            abd.rc.right = Screen.AllScreens(MonNum).Bounds.Right
+            abd.rc.bottom = Screen.AllScreens(MonNum).Bounds.Bottom
         End If
+
+        SHAppBarMessage(CInt(ABMsg.ABM_QUERYPOS), abd)
 
         ' Query the system for an approved size and position. 
         SHAppBarMessage(CInt(ABMsg.ABM_QUERYPOS), abd)
