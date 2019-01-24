@@ -70,6 +70,7 @@ Partial Class Settings
         '
         'AppBarSizeTB
         '
+        Me.AppBarSizeTB.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.AppBarSizeTB.Location = New System.Drawing.Point(10, 65)
         Me.AppBarSizeTB.Name = "AppBarSizeTB"
         Me.AppBarSizeTB.Size = New System.Drawing.Size(62, 20)

@@ -32,6 +32,11 @@ AppBar3000
         &lt;/sectionGr [rest of string was truncated]&quot;;.
 </summary>
 </member>
+<member name="P:AppBar3000.My.Resources.Resources.Close">
+<summary>
+  Looks up a localized resource of type System.Drawing.Bitmap.
+</summary>
+</member>
 <member name="P:AppBar3000.My.Resources.Resources.Gear">
 <summary>
   Looks up a localized resource of type System.Drawing.Bitmap.

@@ -123,13 +123,15 @@ Public Class AppBar3000
 
     Private Sub Form1_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
 
+        Me.Visible = False
         'RegSettings()
         CheckSettings()
         Me.FormBorderStyle = FormBorderStyle.FixedToolWindow
-        PictureBox1.Location = New Point(12.5, 12.5)
+        'PictureBox1.Location = New Point(12.5, 12.5)
         RegisterBar()
         ABSetPos()
         Me.Invalidate()
+        LoadShortcuts()
     End Sub
 
     Public Sub CheckSettings()
@@ -143,10 +145,12 @@ Public Class AppBar3000
     End Sub
 
     Public Sub LoadSettings()
+
         AppBarPosition = My.Settings.AppBarPosition
         MonNum = My.Settings.MonNum
         AppBarSize = My.Settings.AppBarSize
         DisNum = My.Settings.DisNum
+
     End Sub
 
     Public Sub SaveSettings()
@@ -192,6 +196,34 @@ Public Class AppBar3000
         Else
             DisNum = RegDisNum
         End If
+    End Sub
+
+    Private Sub LoadShortcuts()
+
+        Dim ListLocation = My.Computer.FileSystem.CurrentDirectory & "\Shortcut.txt"
+        Dim TextLine As String = ""
+        If File.Exists(ListLocation) = True Then
+            Dim objReader As New System.IO.StreamReader(ListLocation)
+            Do While objReader.Peek() <> -1
+
+                TextLine = objReader.ReadLine()
+                If File.Exists(TextLine) = True Then
+                    Dim pb As New PictureBox With {
+                    .Size = New Size(32, 32),
+                    .Location = New Point(12 + (icons * 44), 12),
+                    .Tag = TextLine
+                }
+                    Dim icon As Icon = Icon.ExtractAssociatedIcon(TextLine)
+                    pb.Image = icon.ToBitmap
+                    pb.Cursor = Cursors.Hand
+                    AddHandler pb.DoubleClick, AddressOf PictureBox1_DoubleClick
+                    ToolTip1.SetToolTip(pb, TextLine)
+                    Me.Controls.Add(pb)
+                    icons += 1
+                End If
+            Loop
+        End If
+
     End Sub
 
     Private Sub RegisterBar()
@@ -300,41 +332,40 @@ Public Class AppBar3000
         MoveWindow(abd.hWnd, abd.rc.left, abd.rc.top, abd.rc.right - abd.rc.left, abd.rc.bottom - abd.rc.top, True)
 
         SettingsLoc()
-
+        Me.Visible = True
     End Sub
 
     Private Sub SettingsLoc()
         If AppBarPosition = 0 Then
-            'SettingsPB.Location = New Point(Screen.AllScreens(MonNum).WorkingArea.Width - 62.5, 12.5)
             SettingsPB.Location = New Point(Me.Size.Width - 62.5, 12.5)
-            FlowLayoutPanel1.Location = New Point(0, 0)
-            FlowLayoutPanel1.Size = New Point(Me.Size.Width - 75, AppBarSize)
-            FlowLayoutPanel1.FlowDirection = FlowDirection.LeftToRight
+            ClosePB.Location = New Point(Me.Size.Width - 15, 0)
+            Form1FlowLayoutPanel1.Location = New Point(0, 0)
+            Form1FlowLayoutPanel1.Size = New Point(Me.Size.Width - 75, AppBarSize)
+            Form1FlowLayoutPanel1.FlowDirection = FlowDirection.LeftToRight
         ElseIf AppBarPosition = 1 Then
-            'SettingsPB.Location = New Point(Screen.AllScreens(MonNum).WorkingArea.Width - 62.5, 12.5)
             SettingsPB.Location = New Point(Me.Size.Width - 62.5, 12.5)
-            FlowLayoutPanel1.Location = New Point(0, 0)
-            FlowLayoutPanel1.Size = New Point(Me.Size.Width - 75, AppBarSize)
-            FlowLayoutPanel1.FlowDirection = FlowDirection.LeftToRight
+            ClosePB.Location = New Point(Me.Size.Width - 15, Me.Size.Width - 15)
+            Form1FlowLayoutPanel1.Location = New Point(0, 0)
+            Form1FlowLayoutPanel1.Size = New Point(Me.Size.Width - 75, AppBarSize)
+            Form1FlowLayoutPanel1.FlowDirection = FlowDirection.LeftToRight
         ElseIf AppBarPosition = 2 Then
-            'SettingsPB.Location = New Point(12.5, Screen.AllScreens(MonNum).WorkingArea.Height - 62.5)
             SettingsPB.Location = New Point(12.5, Me.Size.Height - 62.5)
-            FlowLayoutPanel1.Location = New Point(0, 0)
-            FlowLayoutPanel1.Size = New Point(AppBarSize, Me.Size.Height - 75)
-            FlowLayoutPanel1.FlowDirection = FlowDirection.TopDown
+            ClosePB.Location = New Point(0, Me.Size.Height - 15)
+            Form1FlowLayoutPanel1.Location = New Point(0, 0)
+            Form1FlowLayoutPanel1.Size = New Point(AppBarSize, Me.Size.Height - 75)
+            Form1FlowLayoutPanel1.FlowDirection = FlowDirection.TopDown
         ElseIf AppBarPosition = 3 Then
-            'SettingsPB.Location = New Point(12.5, Screen.AllScreens(MonNum).WorkingArea.Height - 62.5)
             SettingsPB.Location = New Point(12.5, Me.Size.Height - 62.5)
-            FlowLayoutPanel1.Location = New Point(0, 0)
-            FlowLayoutPanel1.Size = New Point(AppBarSize, Me.Size.Height - 75)
-            FlowLayoutPanel1.FlowDirection = FlowDirection.TopDown
+            ClosePB.Location = New Point(Me.Size.Width - 15, Me.Size.Height - 15)
+            Form1FlowLayoutPanel1.Location = New Point(0, 0)
+            Form1FlowLayoutPanel1.Size = New Point(AppBarSize, Me.Size.Height - 75)
+            Form1FlowLayoutPanel1.FlowDirection = FlowDirection.TopDown
         End If
     End Sub
 
     Private Sub Form1_DragDrop(ByVal sender As Object, ByVal e As DragEventArgs) Handles Me.DragDrop
         If e.Data.GetDataPresent(DataFormats.FileDrop) Then
             Dim files() As String = DirectCast(e.Data.GetData(DataFormats.FileDrop, False), String())
-            MsgBox(files)
             For Each file As String In files
                 Dim pb As New PictureBox With {
                     .Size = New Size(32, 32),
@@ -348,6 +379,8 @@ Public Class AppBar3000
                 ToolTip1.SetToolTip(pb, file)
                 Me.Controls.Add(pb)
                 icons += 1
+                Dim ListLocation = My.Computer.FileSystem.CurrentDirectory & "\Shortcut.txt"
+                My.Computer.FileSystem.WriteAllText(ListLocation, file & vbCrLf, True)
             Next
         End If
     End Sub
@@ -364,20 +397,10 @@ Public Class AppBar3000
         End If
     End Sub
 
+
     Private Sub SettingsPB_Click(sender As Object, e As EventArgs) Handles SettingsPB.Click
 
         Settings.Visible = True
-
-    End Sub
-
-    Private Sub FlowLayoutPanel1_DoubleClick() Handles MyBase.DoubleClick
-
-        Me.Close()
-
-    End Sub
-    Private Sub Form1_Doubleclick() Handles MyBase.DoubleClick
-
-        Me.Close()
 
     End Sub
 
@@ -389,4 +412,7 @@ Public Class AppBar3000
 
     End Sub
 
+    Private Sub ClosePB_Click(sender As Object, e As EventArgs) Handles ClosePB.Click
+        Me.Close()
+    End Sub
 End Class

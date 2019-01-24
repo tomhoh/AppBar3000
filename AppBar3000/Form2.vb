@@ -87,6 +87,9 @@ Public Class Settings
     End Sub
 
     Private Sub Settings_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+
+        AppBarSizeTB.Visible = False
+        Label2.Visible = False
         If Screen.AllScreens().Length = 1 Then
             AppBarPositionCB.Items.Add("Top")
             AppBarPositionCB.Items.Add("Bottom")
