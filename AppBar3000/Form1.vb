@@ -6,6 +6,8 @@ Public Class AppBar3000
     Public AppBarPosition As Integer
     Public AppBarSize As Integer
     Public DisNum As Integer
+    Public Shortcuts As New List(Of String)
+    Public ListLocation = My.Computer.FileSystem.CurrentDirectory & "\Shortcut.txt"
 
     Private Structure RECT
         Public left As Integer
@@ -108,19 +110,6 @@ Public Class AppBar3000
         MyBase.WndProc(m)
     End Sub
 
-    'Protected Overloads Overrides ReadOnly Property CreateParams() As System.Windows.Forms.CreateParams
-    'Get
-    'Dim cp As CreateParams = MyBase.CreateParams
-    '       cp.Style = cp.Style And (Not 12582912)
-    '      WS_CAPTION
-    '     cp.Style = cp.Style And (Not 8388608)
-    '     WS_BORDER
-    '   cp.ExStyle = 128 Or 8
-    ' WS_EX_TOOLWINDOW | WS_EX_TOPMOST
-    'Return cp
-    'End Get
-    'End Property
-
     Private Sub Form1_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
 
         Me.Visible = False
@@ -160,6 +149,7 @@ Public Class AppBar3000
         My.Settings.MonNum = MonNum
         My.Settings.DisNum = DisNum
         My.Settings.Save()
+        File.WriteAllLines(ListLocation, Shortcuts.ToArray)
 
     End Sub
 
@@ -200,29 +190,56 @@ Public Class AppBar3000
 
     Private Sub LoadShortcuts()
 
+        'Dim Shortcuts As New List(Of String)
         Dim ListLocation = My.Computer.FileSystem.CurrentDirectory & "\Shortcut.txt"
         Dim TextLine As String = ""
         If File.Exists(ListLocation) = True Then
-            Dim objReader As New System.IO.StreamReader(ListLocation)
-            Do While objReader.Peek() <> -1
-
-                TextLine = objReader.ReadLine()
-                If File.Exists(TextLine) = True Then
-                    Dim pb As New PictureBox With {
+            Using Reader As New StreamReader(ListLocation)
+                While Reader.EndOfStream = False
+                    Shortcuts.Add(Reader.ReadLine())
+                End While
+            End Using
+            'Dim objReader As New StreamReader(ListLocation)
+            'Do While objReader.Peek() <> -1
+            'TextLine = objReader.ReadLine()
+            'If File.Exists(TextLine) = True Then
+            For Each Shortcut As String In Shortcuts
+                Dim pb As New PictureBox With {
                     .Size = New Size(32, 32),
                     .Location = New Point(12 + (icons * 44), 12),
                     .Tag = TextLine
                 }
-                    Dim icon As Icon = Icon.ExtractAssociatedIcon(TextLine)
-                    pb.Image = icon.ToBitmap
+                Dim icon As Icon = Icon.ExtractAssociatedIcon(Shortcut)
+                pb.Image = icon.ToBitmap
                     pb.Cursor = Cursors.Hand
                     AddHandler pb.DoubleClick, AddressOf PictureBox1_DoubleClick
-                    ToolTip1.SetToolTip(pb, TextLine)
-                    Me.Controls.Add(pb)
-                    icons += 1
-                End If
-            Loop
+                    AddHandler pb.MouseDown, AddressOf PictureBox1_MouseDown
+                ToolTip1.SetToolTip(pb, Shortcut)
+                'Form1FlowLayoutPanel1.Controls.Add(pb)
+                Me.Controls.Add(pb)
+                icons += 1
+                'End If
+            Next
+        'Loop
         End If
+
+    End Sub
+
+    Private Sub RemoveShortcut(ByVal RemoveShortcut As String)
+        'Dim ListLocation = My.Computer.FileSystem.CurrentDirectory & "\Shortcut.txt"
+        'Dim fileContents = File.ReadAllLines(ListLocation).ToList
+
+        ' Remove unwanted stuff
+        For i = Shortcuts.Count - 1 To 0 Step -1
+            If Shortcuts(i).Contains(RemoveShortcut) Then
+                Shortcuts.RemoveAt(i)
+                Shortcuts.RemoveAt(i - 1)
+                i -= 1
+            End If
+        Next
+
+        ' Write the file to disk
+
 
     End Sub
 
@@ -364,6 +381,7 @@ Public Class AppBar3000
     End Sub
 
     Private Sub Form1_DragDrop(ByVal sender As Object, ByVal e As DragEventArgs) Handles Me.DragDrop
+        'Private Sub Form1FlowLayoutPanel1_DragDrop(ByVal sender As Object, ByVal e As DragEventArgs) Handles Me.DragDrop
         If e.Data.GetDataPresent(DataFormats.FileDrop) Then
             Dim files() As String = DirectCast(e.Data.GetData(DataFormats.FileDrop, False), String())
             For Each file As String In files
@@ -376,7 +394,9 @@ Public Class AppBar3000
                 pb.Image = icon.ToBitmap
                 pb.Cursor = Cursors.Hand
                 AddHandler pb.DoubleClick, AddressOf PictureBox1_DoubleClick
+                AddHandler pb.MouseDown, AddressOf PictureBox1_MouseDown
                 ToolTip1.SetToolTip(pb, file)
+                'Form1FlowLayoutPanel1.Controls.Add(pb)
                 Me.Controls.Add(pb)
                 icons += 1
                 Dim ListLocation = My.Computer.FileSystem.CurrentDirectory & "\Shortcut.txt"
@@ -389,7 +409,17 @@ Public Class AppBar3000
         Process.Start(DirectCast(sender, PictureBox).Tag.ToString)
     End Sub
 
+    Private Sub PictureBox1_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles PictureBox1.MouseDown
+
+        If e.Button = MouseButtons.Right Then
+            RemoveShortcut(DirectCast(sender, PictureBox).Tag.ToString)
+            DirectCast(sender, PictureBox).Dispose()
+        End If
+
+    End Sub
+
     Private Sub Form1_DragOver(ByVal sender As Object, ByVal e As DragEventArgs) Handles Me.DragOver
+        'Private Sub Form1FlowLayoutPanel1_DragOver(ByVal sender As Object, ByVal e As DragEventArgs) Handles Me.DragOver
         If e.Data.GetDataPresent(DataFormats.FileDrop) Then
             e.Effect = DragDropEffects.Copy
         Else
