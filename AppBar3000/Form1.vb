@@ -8,24 +8,30 @@ Public Class AppBar3000
     Public DisNum As Integer
     Public Shortcuts As New List(Of String)
     Public ListLocation = My.Computer.FileSystem.CurrentDirectory & "\Shortcut.txt"
+    Public RShortcut As String
 
     Private Structure RECT
+
         Public left As Integer
         Public top As Integer
         Public right As Integer
         Public bottom As Integer
+
     End Structure
 
     Private Structure APPBARDATA
+
         Public cbSize As Integer
         Public hWnd As IntPtr
         Public uCallbackMessage As Integer
         Public uEdge As Integer
         Public rc As RECT
         Public lParam As IntPtr
+
     End Structure
 
     Private Enum ABMsg As Integer
+
         ABM_NEW = 0
         ABM_REMOVE = 1
         ABM_QUERYPOS = 2
@@ -37,20 +43,25 @@ Public Class AppBar3000
         ABM_SETAUTOHIDEBAR = 8
         ABM_WINDOWPOSCHANGED = 9
         ABM_SETSTATE = 10
+
     End Enum
 
     Private Enum ABNotify As Integer
+
         ABN_STATECHANGE = 0
         ABN_POSCHANGED
         ABN_FULLSCREENAPP
         ABN_WINDOWARRANGE
+
     End Enum
 
     Private Enum ABEdge As Integer
+
         ABE_LEFT = &H0
         ABE_TOP = &H1
         ABE_RIGHT = &H2
         ABE_BOTTOM = &H3
+
     End Enum
 
     Private fBarRegistered As Boolean = False
@@ -76,14 +87,17 @@ Public Class AppBar3000
     Dim icons As Integer = 0
 
     Protected Overrides Function ProcessCmdKey(ByRef msg As Message, ByVal keyData As Keys) As Boolean
+
         Select Case keyData
             Case Keys.F12
                 LockWorkStation()
         End Select
         Return 0
+
     End Function
 
     Protected Overloads Overrides Sub WndProc(ByRef m As Message)
+
         If m.Msg = uCallBack Then
             Select Case m.WParam.ToInt32()
                 Case CInt(ABNotify.ABN_POSCHANGED)
@@ -92,12 +106,12 @@ Public Class AppBar3000
             End Select
         End If
         MyBase.WndProc(m)
+
     End Sub
 
     Private Sub Form1_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
 
         Me.Visible = False
-        'RegSettings()
         CheckSettings()
         Me.FormBorderStyle = FormBorderStyle.FixedToolWindow
         'PictureBox1.Location = New Point(12.5, 12.5)
@@ -105,9 +119,11 @@ Public Class AppBar3000
         ABSetPos()
         Me.Invalidate()
         LoadShortcuts()
+
     End Sub
 
     Public Sub CheckSettings()
+
         Dim directory As String = AppDomain.CurrentDomain.BaseDirectory + "AppBar3000.exe.config"
         If File.Exists(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile) Then
             AppBarPosition = My.Settings.AppBarPosition
@@ -116,12 +132,13 @@ Public Class AppBar3000
             DisNum = My.Settings.DisNum
         Else
             File.WriteAllText(directory, My.Resources.AppBar3000Config)
-            MsgBox("Configuration file not found" & vbCrLf + "Default settings have been loaded")
+            MsgBox("Configuration file not found" & vbCrLf + "Default settings have been loaded", 64, "Defaults")
             AppBarPosition = 0
             AppBarSize = 75
             DisNum = 1
             MonNum = 0
         End If
+
     End Sub
 
     Public Sub SaveSettings()
@@ -161,29 +178,30 @@ Public Class AppBar3000
                 }
                 Dim icon As Icon = Icon.ExtractAssociatedIcon(Shortcut)
                 pb.Image = icon.ToBitmap
-                    pb.Cursor = Cursors.Hand
-                    AddHandler pb.DoubleClick, AddressOf PictureBox1_DoubleClick
-                    AddHandler pb.MouseDown, AddressOf PictureBox1_MouseDown
+                pb.Cursor = Cursors.Hand
+                AddHandler pb.DoubleClick, AddressOf PictureBox1_DoubleClick
+                AddHandler pb.Click, AddressOf MenuRemoveItem_Click
                 ToolTip1.SetToolTip(pb, Shortcut)
-                'Form1FlowLayoutPanel1.Controls.Add(pb)
-                Me.Controls.Add(pb)
+                Form1FlowLayoutPanel1.Controls.Add(pb)
+                pb.ContextMenuStrip = ContextMenuStrip1
                 icons += 1
                 'End If
             Next
-        'Loop
+            'Loop
         End If
 
     End Sub
 
-    Private Sub RemoveShortcut(ByVal RemoveShortcut As String)
+    Private Function RemoveShortcut(ByVal RShortcut As String)
+
         'Dim ListLocation = My.Computer.FileSystem.CurrentDirectory & "\Shortcut.txt"
         'Dim fileContents = File.ReadAllLines(ListLocation).ToList
 
         ' Remove unwanted stuff
         For i = Shortcuts.Count - 1 To 0 Step -1
-            If Shortcuts(i).Contains(RemoveShortcut) Then
+            If Shortcuts(i).Contains(RShortcut) Then
                 Shortcuts.RemoveAt(i)
-                Shortcuts.RemoveAt(i - 1)
+                'Shortcuts.RemoveAt(i - 1)
                 i -= 1
             End If
         Next
@@ -191,9 +209,10 @@ Public Class AppBar3000
         ' Write the file to disk
 
 
-    End Sub
+    End Function
 
     Private Sub RegisterBar()
+
         Dim abd As New APPBARDATA
         abd.cbSize = Marshal.SizeOf(abd)
         abd.hWnd = Handle
@@ -209,6 +228,7 @@ Public Class AppBar3000
             SHAppBarMessage(CType(ABMsg.ABM_REMOVE, Integer), abd)
             fBarRegistered = False
         End If
+
     End Sub
 
     Public Sub ABSetPos()
@@ -300,9 +320,11 @@ Public Class AppBar3000
 
         SettingsLoc()
         Me.Visible = True
+
     End Sub
 
     Private Sub SettingsLoc()
+
         If AppBarPosition = 0 Then
             SettingsPB.Location = New Point(Me.Size.Width - 62.5, 12.5)
             ClosePB.Location = New Point(Me.Size.Width - 15, 0)
@@ -328,79 +350,57 @@ Public Class AppBar3000
             Form1FlowLayoutPanel1.Size = New Point(AppBarSize, Me.Size.Height - 75)
             Form1FlowLayoutPanel1.FlowDirection = FlowDirection.TopDown
         End If
+
     End Sub
 
-    Private Sub Form1_DragDrop(ByVal sender As Object, ByVal e As DragEventArgs) Handles Me.DragDrop
-        'Private Sub Form1FlowLayoutPanel1_DragDrop(ByVal sender As Object, ByVal e As DragEventArgs) Handles Me.DragDrop
+    Private Sub Form1FlowLayoutPanel1_DragDrop(ByVal sender As Object, ByVal e As DragEventArgs) Handles Form1FlowLayoutPanel1.DragDrop
+
         If e.Data.GetDataPresent(DataFormats.FileDrop) Then
             Dim files() As String = DirectCast(e.Data.GetData(DataFormats.FileDrop, False), String())
             For Each file As String In files
                 Dim pb As New PictureBox With {
-                    .Size = New Size(32, 32),
-                    .Location = New Point(12 + (icons * 44), 12),
+                    .Size = New Size(64, 64),
+                    .Location = New Point(24 + (icons * 44), 24),
                     .Tag = file
                 }
                 Dim icon As Icon = Icon.ExtractAssociatedIcon(file)
                 pb.Image = icon.ToBitmap
                 pb.Cursor = Cursors.Hand
                 AddHandler pb.DoubleClick, AddressOf PictureBox1_DoubleClick
-                AddHandler pb.MouseDown, AddressOf PictureBox1_MouseDown
+                AddHandler pb.Click, AddressOf MenuRemoveItem_Click
                 ToolTip1.SetToolTip(pb, file)
-                'Form1FlowLayoutPanel1.Controls.Add(pb)
-                Me.Controls.Add(pb)
+                Form1FlowLayoutPanel1.Controls.Add(pb)
+                pb.ContextMenuStrip = ContextMenuStrip1
                 icons += 1
-                Dim ListLocation = My.Computer.FileSystem.CurrentDirectory & "\Shortcut.txt"
-                My.Computer.FileSystem.WriteAllText(ListLocation, file & vbCrLf, True)
+                Shortcuts.Add(file)
+                'Dim ListLocation = My.Computer.FileSystem.CurrentDirectory & "\Shortcut.txt"
+                'My.Computer.FileSystem.WriteAllText(ListLocation, file & vbCrLf, True)
             Next
         End If
-    End Sub
 
-    Private Sub Form1FlowLayoutPanel1_DragDrop(ByVal sender As Object, ByVal e As DragEventArgs) Handles Me.DragDrop
-        If e.Data.GetDataPresent(DataFormats.FileDrop) Then
-            Dim files() As String = DirectCast(e.Data.GetData(DataFormats.FileDrop, False), String())
-            For Each file As String In files
-                Dim pb As New PictureBox With {
-                    .Size = New Size(32, 32),
-                    .Location = New Point(12 + (icons * 44), 12),
-                    .Tag = file
-                }
-                Dim icon As Icon = Icon.ExtractAssociatedIcon(file)
-                pb.Image = icon.ToBitmap
-                pb.Cursor = Cursors.Hand
-                AddHandler pb.DoubleClick, AddressOf PictureBox1_DoubleClick
-                AddHandler pb.MouseDown, AddressOf PictureBox1_MouseDown
-                ToolTip1.SetToolTip(pb, file)
-                'Form1FlowLayoutPanel1.Controls.Add(pb)
-                Me.Controls.Add(pb)
-                icons += 1
-                Dim ListLocation = My.Computer.FileSystem.CurrentDirectory & "\Shortcut.txt"
-                My.Computer.FileSystem.WriteAllText(ListLocation, file & vbCrLf, True)
-            Next
-        End If
     End Sub
 
     Private Sub PictureBox1_DoubleClick(ByVal sender As Object, ByVal e As EventArgs)
+
         Process.Start(DirectCast(sender, PictureBox).Tag.ToString)
-    End Sub
-
-    Private Sub PictureBox1_MouseDown(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles PictureBox1.MouseDown
-
-        If e.Button = MouseButtons.Right Then
-            RemoveShortcut(DirectCast(sender, PictureBox).Tag.ToString)
-            DirectCast(sender, PictureBox).Dispose()
-        End If
 
     End Sub
 
-    Private Sub Form1_DragOver(ByVal sender As Object, ByVal e As DragEventArgs) Handles Me.DragOver
-        'Private Sub Form1FlowLayoutPanel1_DragOver(ByVal sender As Object, ByVal e As DragEventArgs) Handles Me.DragOver
+    Private Sub Form1FlowLayoutPanel1_DragOver(ByVal sender As Object, ByVal e As DragEventArgs) Handles Form1FlowLayoutPanel1.DragOver
+
         If e.Data.GetDataPresent(DataFormats.FileDrop) Then
             e.Effect = DragDropEffects.Copy
         Else
             e.Effect = DragDropEffects.None
         End If
+
     End Sub
 
+    Private Sub MenuRemoveItem_Click(sender As Object, e As EventArgs) Handles MenuRemoveItem.Click
+
+        'DirectCast(sender, PictureBox).Dispose()
+
+    End Sub
 
     Private Sub SettingsPB_Click(sender As Object, e As EventArgs) Handles SettingsPB.Click
 
@@ -417,6 +417,9 @@ Public Class AppBar3000
     End Sub
 
     Private Sub ClosePB_Click(sender As Object, e As EventArgs) Handles ClosePB.Click
+
         Me.Close()
+
     End Sub
+
 End Class
