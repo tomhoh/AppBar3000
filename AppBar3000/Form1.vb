@@ -83,22 +83,6 @@ Public Class AppBar3000
         Return 0
     End Function
 
-    Public Function ExtractResourceToDisk(ByVal ResourceName As String, ByVal FileToExtractTo As String) As Boolean
-
-        Dim s As Stream = Reflection.Assembly.GetExecutingAssembly.GetManifestResourceStream(ResourceName)
-        Dim ResourceFile As New FileStream(FileToExtractTo, FileMode.Create)
-
-        Dim b(s.Length) As Byte
-
-        s.Read(b, 0, s.Length)
-        ResourceFile.Write(b, 0, b.Length - 1)
-        ResourceFile.Flush()
-        ResourceFile.Close()
-
-        ResourceFile = Nothing
-        Return 0
-    End Function
-
     Protected Overloads Overrides Sub WndProc(ByRef m As Message)
         If m.Msg = uCallBack Then
             Select Case m.WParam.ToInt32()
@@ -126,66 +110,32 @@ Public Class AppBar3000
     Public Sub CheckSettings()
         Dim directory As String = AppDomain.CurrentDomain.BaseDirectory + "AppBar3000.exe.config"
         If File.Exists(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile) Then
-            LoadSettings()
+            AppBarPosition = My.Settings.AppBarPosition
+            MonNum = My.Settings.MonNum
+            AppBarSize = My.Settings.AppBarSize
+            DisNum = My.Settings.DisNum
         Else
-            ExtractResourceToDisk(My.Resources.AppBar3000Config, directory)
-            LoadSettings()
+            File.WriteAllText(directory, My.Resources.AppBar3000Config)
+            MsgBox("Configuration file not found" & vbCrLf + "Default settings have been loaded")
+            AppBarPosition = 0
+            AppBarSize = 75
+            DisNum = 1
+            MonNum = 0
         End If
-    End Sub
-
-    Public Sub LoadSettings()
-
-        AppBarPosition = My.Settings.AppBarPosition
-        MonNum = My.Settings.MonNum
-        AppBarSize = My.Settings.AppBarSize
-        DisNum = My.Settings.DisNum
-
     End Sub
 
     Public Sub SaveSettings()
 
-        My.Settings.AppBarPosition = AppBarPosition
-        My.Settings.AppBarSize = AppBarSize
-        My.Settings.MonNum = MonNum
-        My.Settings.DisNum = DisNum
-        My.Settings.Save()
+        If File.Exists(AppDomain.CurrentDomain.SetupInformation.ConfigurationFile) Then
+            My.Settings.AppBarPosition = AppBarPosition
+            My.Settings.AppBarSize = AppBarSize
+            My.Settings.MonNum = MonNum
+            My.Settings.DisNum = DisNum
+            My.Settings.Save()
+        End If
+
         File.WriteAllLines(ListLocation, Shortcuts.ToArray)
 
-    End Sub
-
-    Public Sub RegSettings()
-        Dim RegAppBarPosition = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\Software\AbbBar3000", "AppBarPosition", Nothing)
-        Dim RegAppBarSize = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\Software\AbbBar3000", "AppBarSize", Nothing)
-        Dim RegMonNum = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\Software\AbbBar3000", "MonNum", Nothing)
-        Dim RegDisNum = My.Computer.Registry.GetValue("HKEY_CURRENT_USER\Software\AbbBar3000", "DisNum", Nothing)
-
-        If RegAppBarPosition = "" Then
-            My.Computer.Registry.SetValue("HKEY_CURRENT_USER\Software\AbbBar3000", "AppBarPosition", "0")
-            AppBarPosition = 0
-        Else
-            AppBarPosition = RegAppBarPosition
-        End If
-
-        If RegAppBarSize = "" Then
-            My.Computer.Registry.SetValue("HKEY_CURRENT_USER\Software\AbbBar3000", "AppBarSize", "75")
-            AppBarSize = 75
-        Else
-            AppBarSize = RegAppBarSize
-        End If
-
-        If RegMonNum = "" Then
-            My.Computer.Registry.SetValue("HKEY_CURRENT_USER\Software\AbbBar3000", "MonNum", "0")
-            MonNum = 0
-        Else
-            MonNum = RegMonNum
-        End If
-
-        If RegDisNum = "" Then
-            My.Computer.Registry.SetValue("HKEY_CURRENT_USER\Software\AbbBar3000", "DisNum", "1")
-            DisNum = 1
-        Else
-            DisNum = RegDisNum
-        End If
     End Sub
 
     Private Sub LoadShortcuts()
@@ -382,6 +332,30 @@ Public Class AppBar3000
 
     Private Sub Form1_DragDrop(ByVal sender As Object, ByVal e As DragEventArgs) Handles Me.DragDrop
         'Private Sub Form1FlowLayoutPanel1_DragDrop(ByVal sender As Object, ByVal e As DragEventArgs) Handles Me.DragDrop
+        If e.Data.GetDataPresent(DataFormats.FileDrop) Then
+            Dim files() As String = DirectCast(e.Data.GetData(DataFormats.FileDrop, False), String())
+            For Each file As String In files
+                Dim pb As New PictureBox With {
+                    .Size = New Size(32, 32),
+                    .Location = New Point(12 + (icons * 44), 12),
+                    .Tag = file
+                }
+                Dim icon As Icon = Icon.ExtractAssociatedIcon(file)
+                pb.Image = icon.ToBitmap
+                pb.Cursor = Cursors.Hand
+                AddHandler pb.DoubleClick, AddressOf PictureBox1_DoubleClick
+                AddHandler pb.MouseDown, AddressOf PictureBox1_MouseDown
+                ToolTip1.SetToolTip(pb, file)
+                'Form1FlowLayoutPanel1.Controls.Add(pb)
+                Me.Controls.Add(pb)
+                icons += 1
+                Dim ListLocation = My.Computer.FileSystem.CurrentDirectory & "\Shortcut.txt"
+                My.Computer.FileSystem.WriteAllText(ListLocation, file & vbCrLf, True)
+            Next
+        End If
+    End Sub
+
+    Private Sub Form1FlowLayoutPanel1_DragDrop(ByVal sender As Object, ByVal e As DragEventArgs) Handles Me.DragDrop
         If e.Data.GetDataPresent(DataFormats.FileDrop) Then
             Dim files() As String = DirectCast(e.Data.GetData(DataFormats.FileDrop, False), String())
             For Each file As String In files
