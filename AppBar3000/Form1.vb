@@ -9,6 +9,7 @@ Public Class AppBar3000
     Public Shortcuts As New List(Of String)
     Public ListLocation = My.Computer.FileSystem.CurrentDirectory & "\Shortcut.txt"
     Public RShortcut As String
+    Public PBNum As Integer
 
     Private Structure RECT
 
@@ -64,6 +65,18 @@ Public Class AppBar3000
 
     End Enum
 
+    Enum MouseClicks
+        WM_LBUTTONDBLCLK = &H203
+        WM_LBUTTONDOWN = &H201
+        WM_LBUTTONUP = &H202
+        WM_MBUTTONDBLCLK = &H209
+        WM_MBUTTONDOWN = &H207
+        WM_MBUTTONUP = &H208
+        WM_RBUTTONDBLCLK = &H206
+        WM_RBUTTONDOWN = &H204
+        WM_RBUTTONUP = &H205
+    End Enum
+
     Private fBarRegistered As Boolean = False
 
     Private Declare Function SHAppBarMessage Lib "shell32.dll" Alias "SHAppBarMessage" _
@@ -90,7 +103,11 @@ Public Class AppBar3000
 
         Select Case keyData
             Case Keys.F12
-                LockWorkStation()
+                'LockWorkStation()
+                GetAll(Me, GetType(PictureBox)).ToList.ForEach(
+            Sub(c)
+                Console.WriteLine("{0}.{1}", c.Parent.Name, c.Name)
+            End Sub)
         End Select
         Return 0
 
@@ -109,8 +126,16 @@ Public Class AppBar3000
 
     End Sub
 
-    Private Sub Form1_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+    Public Function GetAll(ByVal sender As Control, ByVal T As Type) As IEnumerable(Of Control)
+        Dim controls = sender.Controls.Cast(Of Control)()
+        Return controls.SelectMany(
+            Function(ctrl) GetAll(ctrl, T)).Concat(controls).Where(
+            Function(c) c.GetType() Is T)
+    End Function
 
+    Private Sub Form1_Load(ByVal sender As Object, ByVal e As EventArgs) Handles MyBase.Load
+
+        PBNum = 0
         Me.Visible = False
         CheckSettings()
         Me.FormBorderStyle = FormBorderStyle.FixedToolWindow
@@ -157,37 +182,32 @@ Public Class AppBar3000
 
     Private Sub LoadShortcuts()
 
-        'Dim Shortcuts As New List(Of String)
         Dim ListLocation = My.Computer.FileSystem.CurrentDirectory & "\Shortcut.txt"
         Dim TextLine As String = ""
+        PBNum = PBNum + 1
         If File.Exists(ListLocation) = True Then
             Using Reader As New StreamReader(ListLocation)
                 While Reader.EndOfStream = False
                     Shortcuts.Add(Reader.ReadLine())
                 End While
             End Using
-            'Dim objReader As New StreamReader(ListLocation)
-            'Do While objReader.Peek() <> -1
-            'TextLine = objReader.ReadLine()
-            'If File.Exists(TextLine) = True Then
             For Each Shortcut As String In Shortcuts
                 Dim pb As New PictureBox With {
                     .Size = New Size(32, 32),
                     .Location = New Point(12 + (icons * 44), 12),
-                    .Tag = TextLine
+                    .Tag = Shortcut,
+                    .Name = "pb" + PBNum.ToString
                 }
                 Dim icon As Icon = Icon.ExtractAssociatedIcon(Shortcut)
                 pb.Image = icon.ToBitmap
                 pb.Cursor = Cursors.Hand
                 AddHandler pb.DoubleClick, AddressOf PictureBox1_DoubleClick
-                AddHandler pb.Click, AddressOf MenuRemoveItem_Click
+                AddHandler pb.Click, AddressOf PictureBox1_MouseUp
                 ToolTip1.SetToolTip(pb, Shortcut)
+                PBNum = PBNum + 1
                 Form1FlowLayoutPanel1.Controls.Add(pb)
-                pb.ContextMenuStrip = ContextMenuStrip1
                 icons += 1
-                'End If
             Next
-            'Loop
         End If
 
     End Sub
@@ -207,7 +227,7 @@ Public Class AppBar3000
         Next
 
         ' Write the file to disk
-
+        Return 0
 
     End Function
 
@@ -361,20 +381,19 @@ Public Class AppBar3000
                 Dim pb As New PictureBox With {
                     .Size = New Size(64, 64),
                     .Location = New Point(24 + (icons * 44), 24),
-                    .Tag = file
+                    .Tag = file,
+                    .Name = "pb" + PBNum.ToString
                 }
                 Dim icon As Icon = Icon.ExtractAssociatedIcon(file)
                 pb.Image = icon.ToBitmap
                 pb.Cursor = Cursors.Hand
                 AddHandler pb.DoubleClick, AddressOf PictureBox1_DoubleClick
-                AddHandler pb.Click, AddressOf MenuRemoveItem_Click
+                AddHandler pb.Click, AddressOf PictureBox1_MouseUp
                 ToolTip1.SetToolTip(pb, file)
+                PBNum = PBNum + 1
                 Form1FlowLayoutPanel1.Controls.Add(pb)
-                pb.ContextMenuStrip = ContextMenuStrip1
                 icons += 1
                 Shortcuts.Add(file)
-                'Dim ListLocation = My.Computer.FileSystem.CurrentDirectory & "\Shortcut.txt"
-                'My.Computer.FileSystem.WriteAllText(ListLocation, file & vbCrLf, True)
             Next
         End If
 
@@ -382,7 +401,8 @@ Public Class AppBar3000
 
     Private Sub PictureBox1_DoubleClick(ByVal sender As Object, ByVal e As EventArgs)
 
-        Process.Start(DirectCast(sender, PictureBox).Tag.ToString)
+        MsgBox(DirectCast(sender, PictureBox).Tag.ToString)
+        'Process.Start(DirectCast(sender, PictureBox).Tag.ToString)
 
     End Sub
 
@@ -396,9 +416,24 @@ Public Class AppBar3000
 
     End Sub
 
-    Private Sub MenuRemoveItem_Click(sender As Object, e As EventArgs) Handles MenuRemoveItem.Click
+    Private Sub PictureBox1_MouseUp(ByVal sender As Object, ByVal e As EventArgs) Handles PictureBox1.MouseUp
 
-        'DirectCast(sender, PictureBox).Dispose()
+        'If e.Button <> MouseButtons.Right Then Return
+        Dim cms = New ContextMenuStrip
+        Dim item1 = cms.Items.Add("Remove Shortcut")
+        item1.Tag = 1
+        AddHandler item1.Click, AddressOf menuChoice
+
+    End Sub
+
+    Private Sub menuChoice(ByVal sender As Object, ByVal e As EventArgs)
+
+        Dim item = CType(sender, ToolStripMenuItem)
+        Dim selection = CInt(item.Tag)
+
+        If selection = 1 Then
+            DirectCast(sender, PictureBox).Dispose = True
+        End If
 
     End Sub
 

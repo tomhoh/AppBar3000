@@ -26,14 +26,11 @@ Partial Class AppBar3000
         Me.SettingsPB = New System.Windows.Forms.PictureBox()
         Me.Form1FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
         Me.PictureBox1 = New System.Windows.Forms.PictureBox()
-        Me.ContextMenuStrip1 = New System.Windows.Forms.ContextMenuStrip(Me.components)
-        Me.MenuRemoveItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ClosePB = New System.Windows.Forms.PictureBox()
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         CType(Me.SettingsPB, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.Form1FlowLayoutPanel1.SuspendLayout()
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.ContextMenuStrip1.SuspendLayout()
         CType(Me.ClosePB, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -58,25 +55,12 @@ Partial Class AppBar3000
         '
         'PictureBox1
         '
-        Me.PictureBox1.ContextMenuStrip = Me.ContextMenuStrip1
         Me.PictureBox1.Location = New System.Drawing.Point(3, 3)
         Me.PictureBox1.Name = "PictureBox1"
         Me.PictureBox1.Size = New System.Drawing.Size(32, 32)
         Me.PictureBox1.TabIndex = 0
         Me.PictureBox1.TabStop = False
         Me.PictureBox1.Visible = False
-        '
-        'ContextMenuStrip1
-        '
-        Me.ContextMenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.MenuRemoveItem})
-        Me.ContextMenuStrip1.Name = "ContextMenuStrip1"
-        Me.ContextMenuStrip1.Size = New System.Drawing.Size(181, 48)
-        '
-        'MenuRemoveItem
-        '
-        Me.MenuRemoveItem.Name = "MenuRemoveItem"
-        Me.MenuRemoveItem.Size = New System.Drawing.Size(180, 22)
-        Me.MenuRemoveItem.Text = "Remove"
         '
         'ClosePB
         '
@@ -109,7 +93,6 @@ Partial Class AppBar3000
         CType(Me.SettingsPB, System.ComponentModel.ISupportInitialize).EndInit()
         Me.Form1FlowLayoutPanel1.ResumeLayout(False)
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.ContextMenuStrip1.ResumeLayout(False)
         CType(Me.ClosePB, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
@@ -120,6 +103,4 @@ Partial Class AppBar3000
     Friend WithEvents PictureBox1 As PictureBox
     Friend WithEvents ClosePB As PictureBox
     Friend WithEvents ToolTip1 As ToolTip
-    Friend WithEvents ContextMenuStrip1 As ContextMenuStrip
-    Friend WithEvents MenuRemoveItem As ToolStripMenuItem
 End Class
