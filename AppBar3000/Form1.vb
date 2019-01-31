@@ -11,6 +11,7 @@ Public Class AppBar3000
     Public RShortcut As String
     Public PBNum As Integer
     Public pbtags As New List(Of String)
+    Public RClick As Integer = 0
 
     Private Structure RECT
 
@@ -64,18 +65,6 @@ Public Class AppBar3000
         ABE_RIGHT = &H2
         ABE_BOTTOM = &H3
 
-    End Enum
-
-    Enum MouseClicks
-        WM_LBUTTONDBLCLK = &H203
-        WM_LBUTTONDOWN = &H201
-        WM_LBUTTONUP = &H202
-        WM_MBUTTONDBLCLK = &H209
-        WM_MBUTTONDOWN = &H207
-        WM_MBUTTONUP = &H208
-        WM_RBUTTONDBLCLK = &H206
-        WM_RBUTTONDOWN = &H204
-        WM_RBUTTONUP = &H205
     End Enum
 
     Private fBarRegistered As Boolean = False
@@ -140,7 +129,6 @@ Public Class AppBar3000
         Me.Visible = False
         CheckSettings()
         Me.FormBorderStyle = FormBorderStyle.FixedToolWindow
-        'PictureBox1.Location = New Point(12.5, 12.5)
         RegisterBar()
         ABSetPos()
         Me.Invalidate()
@@ -203,8 +191,9 @@ Public Class AppBar3000
                     Dim icon As Icon = Icon.ExtractAssociatedIcon(Shortcut)
                     pb.Image = icon.ToBitmap
                     pb.Cursor = Cursors.Hand
-                    AddHandler pb.DoubleClick, AddressOf PictureBox1_DoubleClick
-                    AddHandler pb.Click, AddressOf PictureBox1_MouseUp
+                    AddHandler pb.DoubleClick, AddressOf PictureBox_DoubleClick
+                    AddHandler pb.MouseDown, AddressOf PictureBox_MouseDown
+                    AddHandler pb.MouseUp, AddressOf PictureBox_MouseUp
                     ToolTip1.SetToolTip(pb, Shortcut)
                     PBNum = PBNum + 1
                     pbtags.Add(Shortcut)
@@ -225,8 +214,6 @@ Public Class AppBar3000
         For i = Shortcuts.Count - 1 To 0 Step -1
             If Shortcuts(i).Contains(RShortcut) Then
                 Shortcuts.RemoveAt(i)
-                'Shortcuts.RemoveAt(i - 1)
-                i -= 1
             End If
         Next
 
@@ -384,15 +371,17 @@ Public Class AppBar3000
             For Each file As String In files
                 Dim pb As New PictureBox With {
                     .Size = New Size(64, 64),
-                    .Location = New Point(24 + (icons * 44), 24),
+                    .Location = New Point(12 + (icons * 44), 12),
                     .Tag = file,
                     .Name = "pb" + PBNum.ToString
                 }
                 Dim icon As Icon = Icon.ExtractAssociatedIcon(file)
                 pb.Image = icon.ToBitmap
                 pb.Cursor = Cursors.Hand
-                AddHandler pb.DoubleClick, AddressOf PictureBox1_DoubleClick
-                AddHandler pb.Click, AddressOf PictureBox1_MouseUp
+                AddHandler pb.DoubleClick, AddressOf PictureBox_DoubleClick
+                AddHandler pb.Click, AddressOf Mouse_Click
+                AddHandler pb.MouseDown, AddressOf PictureBox_MouseDown
+                AddHandler pb.MouseUp, AddressOf PictureBox_MouseUp
                 ToolTip1.SetToolTip(pb, file)
                 PBNum = PBNum + 1
                 pbtags.Add(file)
@@ -404,11 +393,15 @@ Public Class AppBar3000
 
     End Sub
 
-    Private Sub PictureBox1_DoubleClick(ByVal sender As Object, ByVal e As EventArgs)
+    Private Sub PictureBox_DoubleClick(ByVal sender As Object, ByVal e As EventArgs)
 
-        'MsgBox(DirectCast(sender, PictureBox).Tag.ToString)
-        MsgBox(sender.GetType.ToString)
-        'Process.Start(DirectCast(sender, PictureBox).Tag.ToString)
+        If File.Exists(DirectCast(sender, PictureBox).Tag.ToString) Then
+            Try
+                Process.Start(DirectCast(sender, PictureBox).Tag.ToString)
+            Catch
+                End
+            End Try
+        End If
 
     End Sub
 
@@ -422,12 +415,26 @@ Public Class AppBar3000
 
     End Sub
 
-    Private Sub PictureBox1_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles PictureBox1.MouseUp
+    Private Sub PictureBox_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs)
 
-        For Each pbtag As String In pbtags
+        If e.Button = MouseButtons.Right Then
+            RClick = 1
+        End If
 
+    End Sub
 
-        Next
+    Private Sub PictureBox_MouseUp(sender As Object, ByVal e As EventArgs)
+
+        If RClick = 1 Then
+            DirectCast(sender, PictureBox).Dispose()
+            RClick = 0
+            RemoveShortcut(DirectCast(sender, PictureBox).Tag.ToString)
+        End If
+
+    End Sub
+
+    Private Sub Mouse_Click(sender As Object, ByVal e As MouseEventArgs)
+
     End Sub
 
     Private Sub SettingsPB_Click(sender As Object, e As EventArgs) Handles SettingsPB.Click

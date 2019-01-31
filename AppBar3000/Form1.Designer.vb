@@ -25,12 +25,9 @@ Partial Class AppBar3000
         Me.components = New System.ComponentModel.Container()
         Me.SettingsPB = New System.Windows.Forms.PictureBox()
         Me.Form1FlowLayoutPanel1 = New System.Windows.Forms.FlowLayoutPanel()
-        Me.PictureBox1 = New System.Windows.Forms.PictureBox()
         Me.ClosePB = New System.Windows.Forms.PictureBox()
         Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
         CType(Me.SettingsPB, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.Form1FlowLayoutPanel1.SuspendLayout()
-        CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.ClosePB, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -47,20 +44,10 @@ Partial Class AppBar3000
         'Form1FlowLayoutPanel1
         '
         Me.Form1FlowLayoutPanel1.AllowDrop = True
-        Me.Form1FlowLayoutPanel1.Controls.Add(Me.PictureBox1)
         Me.Form1FlowLayoutPanel1.Location = New System.Drawing.Point(12, 12)
         Me.Form1FlowLayoutPanel1.Name = "Form1FlowLayoutPanel1"
         Me.Form1FlowLayoutPanel1.Size = New System.Drawing.Size(134, 318)
         Me.Form1FlowLayoutPanel1.TabIndex = 2
-        '
-        'PictureBox1
-        '
-        Me.PictureBox1.Location = New System.Drawing.Point(3, 3)
-        Me.PictureBox1.Name = "PictureBox1"
-        Me.PictureBox1.Size = New System.Drawing.Size(32, 32)
-        Me.PictureBox1.TabIndex = 0
-        Me.PictureBox1.TabStop = False
-        Me.PictureBox1.Visible = False
         '
         'ClosePB
         '
@@ -88,11 +75,9 @@ Partial Class AppBar3000
         Me.ForeColor = System.Drawing.Color.White
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow
         Me.Name = "AppBar3000"
-        Me.Opacity = 0.9R
+        Me.Opacity = 0.7R
         Me.RightToLeftLayout = True
         CType(Me.SettingsPB, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.Form1FlowLayoutPanel1.ResumeLayout(False)
-        CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.ClosePB, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
@@ -100,7 +85,6 @@ Partial Class AppBar3000
 
     Friend WithEvents SettingsPB As PictureBox
     Friend WithEvents Form1FlowLayoutPanel1 As FlowLayoutPanel
-    Friend WithEvents PictureBox1 As PictureBox
     Friend WithEvents ClosePB As PictureBox
     Friend WithEvents ToolTip1 As ToolTip
 End Class
