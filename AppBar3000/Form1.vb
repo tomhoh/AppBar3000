@@ -10,6 +10,7 @@ Public Class AppBar3000
     Public ListLocation = My.Computer.FileSystem.CurrentDirectory & "\Shortcut.txt"
     Public RShortcut As String
     Public PBNum As Integer
+    Public pbtags As New List(Of String)
 
     Private Structure RECT
 
@@ -192,21 +193,24 @@ Public Class AppBar3000
                 End While
             End Using
             For Each Shortcut As String In Shortcuts
-                Dim pb As New PictureBox With {
+                If File.Exists(Shortcut) = True Then
+                    Dim pb As New PictureBox With {
                     .Size = New Size(32, 32),
                     .Location = New Point(12 + (icons * 44), 12),
                     .Tag = Shortcut,
                     .Name = "pb" + PBNum.ToString
                 }
-                Dim icon As Icon = Icon.ExtractAssociatedIcon(Shortcut)
-                pb.Image = icon.ToBitmap
-                pb.Cursor = Cursors.Hand
-                AddHandler pb.DoubleClick, AddressOf PictureBox1_DoubleClick
-                AddHandler pb.Click, AddressOf PictureBox1_MouseUp
-                ToolTip1.SetToolTip(pb, Shortcut)
-                PBNum = PBNum + 1
-                Form1FlowLayoutPanel1.Controls.Add(pb)
-                icons += 1
+                    Dim icon As Icon = Icon.ExtractAssociatedIcon(Shortcut)
+                    pb.Image = icon.ToBitmap
+                    pb.Cursor = Cursors.Hand
+                    AddHandler pb.DoubleClick, AddressOf PictureBox1_DoubleClick
+                    AddHandler pb.Click, AddressOf PictureBox1_MouseUp
+                    ToolTip1.SetToolTip(pb, Shortcut)
+                    PBNum = PBNum + 1
+                    pbtags.Add(Shortcut)
+                    Form1FlowLayoutPanel1.Controls.Add(pb)
+                    icons += 1
+                End If
             Next
         End If
 
@@ -391,6 +395,7 @@ Public Class AppBar3000
                 AddHandler pb.Click, AddressOf PictureBox1_MouseUp
                 ToolTip1.SetToolTip(pb, file)
                 PBNum = PBNum + 1
+                pbtags.Add(file)
                 Form1FlowLayoutPanel1.Controls.Add(pb)
                 icons += 1
                 Shortcuts.Add(file)
@@ -401,7 +406,8 @@ Public Class AppBar3000
 
     Private Sub PictureBox1_DoubleClick(ByVal sender As Object, ByVal e As EventArgs)
 
-        MsgBox(DirectCast(sender, PictureBox).Tag.ToString)
+        'MsgBox(DirectCast(sender, PictureBox).Tag.ToString)
+        MsgBox(sender.GetType.ToString)
         'Process.Start(DirectCast(sender, PictureBox).Tag.ToString)
 
     End Sub
@@ -416,25 +422,12 @@ Public Class AppBar3000
 
     End Sub
 
-    Private Sub PictureBox1_MouseUp(ByVal sender As Object, ByVal e As EventArgs) Handles PictureBox1.MouseUp
+    Private Sub PictureBox1_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles PictureBox1.MouseUp
 
-        'If e.Button <> MouseButtons.Right Then Return
-        Dim cms = New ContextMenuStrip
-        Dim item1 = cms.Items.Add("Remove Shortcut")
-        item1.Tag = 1
-        AddHandler item1.Click, AddressOf menuChoice
+        For Each pbtag As String In pbtags
 
-    End Sub
 
-    Private Sub menuChoice(ByVal sender As Object, ByVal e As EventArgs)
-
-        Dim item = CType(sender, ToolStripMenuItem)
-        Dim selection = CInt(item.Tag)
-
-        If selection = 1 Then
-            DirectCast(sender, PictureBox).Dispose = True
-        End If
-
+        Next
     End Sub
 
     Private Sub SettingsPB_Click(sender As Object, e As EventArgs) Handles SettingsPB.Click
