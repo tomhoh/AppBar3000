@@ -14,5 +14,11 @@
     <Setting Name="DisNum" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">1</Value>
     </Setting>
+    <Setting Name="TBar" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">1</Value>
+    </Setting>
+    <Setting Name="TBarValue" Type="System.Decimal" Scope="User">
+      <Value Profile="(Default)">0.9</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

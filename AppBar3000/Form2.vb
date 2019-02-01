@@ -56,31 +56,9 @@ Public Class Settings
         Else
             AppBar3000.AppBarSize = AppBarSizeTB.Text
         End If
-
+        AppBar3000.SetTransparency()
+        AppBar3000.SaveSettings()
         AppBar3000.ABSetPos()
-    End Sub
-
-    Private Sub AppBarSizeTB_KeyPress(ByVal sender As Object, ByVal e As KeyPressEventArgs) Handles AppBarSizeTB.KeyPress
-
-        '97 - 122 = Ascii codes for simple letters
-        '65 - 90  = Ascii codes for capital letters
-        '48 - 57  = Ascii codes for numbers
-
-        If Asc(e.KeyChar) <> 8 Then
-            If Asc(e.KeyChar) < 48 Or Asc(e.KeyChar) > 57 Then
-                e.Handled = True
-            End If
-        End If
-
-    End Sub
-
-    Private Sub AppBarSizeTB_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles AppBarSizeTB.TextChanged
-        Dim digitsOnly As Regex = New Regex("[^\d]")
-        AppBarSizeTB.Text = digitsOnly.Replace(AppBarSizeTB.Text, "")
-    End Sub
-
-    Private Sub AppBarSizeTB_MouseMoved(ByVal sender As Object, ByVal e As System.EventArgs) Handles AppBarSizeTB.MouseMove
-        ToolTip2.SetToolTip(AppBarSizeTB, "Please Enter Numbers Only")
     End Sub
 
     Private Sub AppBarPositionCB_SelectedIndexChanged(sender As Object, e As EventArgs) Handles AppBarPositionCB.SelectedIndexChanged
@@ -90,6 +68,32 @@ Public Class Settings
 
         AppBarSizeTB.Visible = False
         Label2.Visible = False
+        If AppBar3000.TBar = 0 Then
+            CTrancparency.Checked() = False
+            R90.Enabled = False
+            R80.Enabled = False
+            R70.Enabled = False
+        Else
+            CTrancparency.Checked() = True
+            R90.Enabled = True
+            R80.Enabled = True
+            R70.Enabled = True
+        End If
+
+        If AppBar3000.TBarValue = 0.9 Then
+            R90.Checked = True
+            R80.Checked = False
+            R70.Checked = False
+        ElseIf AppBar3000.TBarValue = 0.8 Then
+            R90.Checked = False
+            R80.Checked = True
+            R70.Checked = False
+        ElseIf AppBar3000.TBarValue = 0.7 Then
+            R90.Checked = False
+            R80.Checked = False
+            R70.Checked = True
+        End If
+
         If Screen.AllScreens().Length = 1 Then
             AppBarPositionCB.Items.Add("Top")
             AppBarPositionCB.Items.Add("Bottom")
@@ -130,4 +134,51 @@ Public Class Settings
         AppBarPositionCB.SelectedIndex = AppBar3000.AppBarPosition
 
     End Sub
+
+    Private Sub CTrancparency_CheckedChanged(sender As Object, e As EventArgs) Handles CTrancparency.CheckedChanged
+
+        If CTrancparency.Checked() = True Then
+            R90.Enabled = True
+            R80.Enabled = True
+            R70.Enabled = True
+            AppBar3000.TBar = 1
+        ElseIf CTrancparency.Checked() = False Then
+            R90.Enabled = False
+            R80.Enabled = False
+            R70.Enabled = False
+            AppBar3000.TBar = 0
+        End If
+
+    End Sub
+
+    Private Sub R90_CheckedChanged(sender As Object, e As EventArgs) Handles R90.CheckedChanged
+
+        If R90.Checked = True Then
+            AppBar3000.TBarValue = 0.9
+            R80.Checked = False
+            R70.Checked = False
+        End If
+
+    End Sub
+
+    Private Sub R80_CheckedChanged(sender As Object, e As EventArgs) Handles R80.CheckedChanged
+
+        If R80.Checked = True Then
+            AppBar3000.TBarValue = 0.7
+            R90.Checked = False
+            R70.Checked = False
+        End If
+
+    End Sub
+
+    Private Sub R70_CheckedChanged(sender As Object, e As EventArgs) Handles R70.CheckedChanged
+
+        If R70.Checked = True Then
+            AppBar3000.TBarValue = 0.3
+            R90.Checked = False
+            R80.Checked = False
+        End If
+
+    End Sub
+
 End Class

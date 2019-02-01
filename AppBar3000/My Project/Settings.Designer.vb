@@ -101,6 +101,30 @@ Namespace My
                 Me("DisNum") = value
             End Set
         End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("1")>  _
+        Public Property TBar() As Integer
+            Get
+                Return CType(Me("TBar"),Integer)
+            End Get
+            Set
+                Me("TBar") = value
+            End Set
+        End Property
+        
+        <Global.System.Configuration.UserScopedSettingAttribute(),  _
+         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.Configuration.DefaultSettingValueAttribute("0.9")>  _
+        Public Property TBarValue() As Decimal
+            Get
+                Return CType(Me("TBarValue"),Decimal)
+            End Get
+            Set
+                Me("TBarValue") = value
+            End Set
+        End Property
     End Class
 End Namespace
 

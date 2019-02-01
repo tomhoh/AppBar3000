@@ -12,6 +12,8 @@ Public Class AppBar3000
     Public PBNum As Integer
     Public pbtags As New List(Of String)
     Public RClick As Integer = 0
+    Public TBar As Integer
+    Public TBarValue As Decimal
 
     Private Structure RECT
 
@@ -130,10 +132,19 @@ Public Class AppBar3000
         CheckSettings()
         Me.FormBorderStyle = FormBorderStyle.FixedToolWindow
         RegisterBar()
+        SetTransparency()
         ABSetPos()
         Me.Invalidate()
         LoadShortcuts()
 
+    End Sub
+
+    Public Sub SetTransparency()
+        If TBar = 1 Then
+            Me.Opacity = TBarValue
+        Else
+            Me.Opacity = 1
+        End If
     End Sub
 
     Public Sub CheckSettings()
@@ -144,6 +155,8 @@ Public Class AppBar3000
             MonNum = My.Settings.MonNum
             AppBarSize = My.Settings.AppBarSize
             DisNum = My.Settings.DisNum
+            TBar = My.Settings.TBar
+            TBarValue = My.Settings.TBarValue
         Else
             File.WriteAllText(directory, My.Resources.AppBar3000Config)
             MsgBox("Configuration file not found" & vbCrLf + "Default settings have been loaded", 64, "Defaults")
@@ -151,6 +164,8 @@ Public Class AppBar3000
             AppBarSize = 75
             DisNum = 1
             MonNum = 0
+            TBar = 1
+            TBarValue = 0.9
         End If
 
     End Sub
@@ -162,6 +177,8 @@ Public Class AppBar3000
             My.Settings.AppBarSize = AppBarSize
             My.Settings.MonNum = MonNum
             My.Settings.DisNum = DisNum
+            My.Settings.TBarValue = TBarValue
+            My.Settings.TBar = TBar
             My.Settings.Save()
         End If
 
