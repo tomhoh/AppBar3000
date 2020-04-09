@@ -14,6 +14,8 @@ Public Class AppBar3000
     Public RClick As Integer = 0
     Public TBar As Integer
     Public TBarValue As Decimal
+    Public DeletedBox As String
+    Public DeletedBoxName As Object
 
     Private Structure RECT
 
@@ -129,6 +131,8 @@ Public Class AppBar3000
 
         PBNum = 0
         Me.Visible = False
+        SettingsPB.Visible = False
+        ClosePB.Visible = False
         CheckSettings()
         Me.FormBorderStyle = FormBorderStyle.FixedToolWindow
         RegisterBar()
@@ -136,9 +140,29 @@ Public Class AppBar3000
         ABSetPos()
         Me.Invalidate()
         LoadShortcuts()
-
+        CmsMenu()
     End Sub
 
+    Public Sub CmsMenu()
+        Dim Cms1 = New ContextMenuStrip
+        Dim Menu1Item1 = Cms1.Items.Add("Settings")
+        Dim Menu1Item2 = Cms1.Items.Add("Exit")
+
+        Dim Cms2 = New ContextMenuStrip
+        Dim Menu2Item1 = Cms2.Items.Add("Remove")
+    End Sub
+
+    Private Sub ExitToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ExitToolStripMenuItem.Click
+        Me.Close()
+    End Sub
+    Private Sub SettingsToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SettingsToolStripMenuItem.Click
+        Settings.Visible = True
+    End Sub
+
+    Private Sub RemoveToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RemoveToolStripMenuItem.Click
+        DeletedBoxName.Dispose
+        RemoveShortcut(DeletedBox)
+    End Sub
     Public Sub SetTransparency()
         If TBar = 1 Then
             Me.Opacity = TBarValue
@@ -203,7 +227,8 @@ Public Class AppBar3000
                     .Size = New Size(32, 32),
                     .Location = New Point(12 + (icons * 44), 12),
                     .Tag = Shortcut,
-                    .Name = "pb" + PBNum.ToString
+                    .Name = "pb" + PBNum.ToString,
+                    .ContextMenuStrip = Cms2
                 }
                     Dim icon As Icon = Icon.ExtractAssociatedIcon(Shortcut)
                     pb.Image = icon.ToBitmap
@@ -354,13 +379,13 @@ Public Class AppBar3000
     Private Sub SettingsLoc()
 
         If AppBarPosition = 0 Then
-            SettingsPB.Location = New Point(Me.Size.Width - 62.5, 12.5)
+            SettingsPB.Location = New Point(Me.Size.Width - 15, 20)
             ClosePB.Location = New Point(Me.Size.Width - 15, 0)
             Form1FlowLayoutPanel1.Location = New Point(0, 0)
             Form1FlowLayoutPanel1.Size = New Point(Me.Size.Width - 75, AppBarSize)
             Form1FlowLayoutPanel1.FlowDirection = FlowDirection.LeftToRight
         ElseIf AppBarPosition = 1 Then
-            SettingsPB.Location = New Point(Me.Size.Width - 62.5, 12.5)
+            SettingsPB.Location = New Point(Me.Size.Width - 15, 20)
             ClosePB.Location = New Point(Me.Size.Width - 15, Me.Size.Width - 15)
             Form1FlowLayoutPanel1.Location = New Point(0, 0)
             Form1FlowLayoutPanel1.Size = New Point(Me.Size.Width - 75, AppBarSize)
@@ -387,10 +412,11 @@ Public Class AppBar3000
             Dim files() As String = DirectCast(e.Data.GetData(DataFormats.FileDrop, False), String())
             For Each file As String In files
                 Dim pb As New PictureBox With {
-                    .Size = New Size(64, 64),
-                    .Location = New Point(12 + (icons * 44), 12),
+                    .Size = New Size(32, 32),
+                    .Location = New Point(12 + (icons * 34), 12),
                     .Tag = file,
-                    .Name = "pb" + PBNum.ToString
+                    .Name = "pb" + PBNum.ToString,
+                    .ContextMenuStrip = Cms2
                 }
                 Dim icon As Icon = Icon.ExtractAssociatedIcon(file)
                 pb.Image = icon.ToBitmap
@@ -443,9 +469,11 @@ Public Class AppBar3000
     Private Sub PictureBox_MouseUp(sender As Object, ByVal e As EventArgs)
 
         If RClick = 1 Then
-            DirectCast(sender, PictureBox).Dispose()
+            'DirectCast(sender, PictureBox).Dispose()
             RClick = 0
-            RemoveShortcut(DirectCast(sender, PictureBox).Tag.ToString)
+            DeletedBox = DirectCast(sender, PictureBox).Tag.ToString
+            DeletedBoxName = DirectCast(sender, PictureBox).Name.ToString
+            'RemoveShortcut(DirectCast(sender, PictureBox).Tag.ToString)
         End If
 
     End Sub

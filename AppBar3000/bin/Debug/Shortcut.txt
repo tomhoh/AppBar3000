@@ -1,5 +1,14 @@
-C:\Users\dphelps\Downloads\Mr.Phelps_64167f02da35.cfg
-C:\Users\dphelps\Downloads\PhotoFix_v1.bat
-C:\Users\dphelps\Downloads\Script.lnk
-C:\Users\dphelps\Downloads\test.reg
-C:\Users\dphelps\Downloads\Votacall Restricted International Calling Services.pdf
+C:\Users\dphelps\Downloads\AutoHotkey_1.1.32.00_setup.exe
+C:\Users\dphelps\Downloads\autoit-v3-setup.exe
+C:\Users\dphelps\Downloads\ChromeSetup.exe
+C:\Users\dphelps\Downloads\dphelps@jcurve.com.ost
+C:\Users\dphelps\Downloads\gimp-2.10.18-setup-1.exe
+C:\Users\dphelps\Downloads\icons.zip
+C:\Users\dphelps\Downloads\LGS_9.02.65_x64_Logitech.exe
+C:\Users\dphelps\Downloads\MobileConnect.bc-uc.win-22.7.5.159.msi
+C:\Users\dphelps\Downloads\npp.7.8.5.Installer.exe
+C:\Users\dphelps\Downloads\OpenShellSetup_4_4_142.exe
+C:\Users\dphelps\Downloads\RingCentral-20.2.1-x64.exe
+C:\Users\dphelps\Downloads\SlackSetup.exe
+C:\Users\dphelps\Downloads\source.lnk
+C:\Users\dphelps\Downloads\TeamViewer_Setup.exe
