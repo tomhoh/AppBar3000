@@ -66,7 +66,6 @@ Partial Class Settings
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Enabled = False
         Me.Label2.Location = New System.Drawing.Point(7, 118)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(65, 13)
@@ -77,12 +76,11 @@ Partial Class Settings
         'AppBarSizeTB
         '
         Me.AppBarSizeTB.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-        Me.AppBarSizeTB.Enabled = False
         Me.AppBarSizeTB.Location = New System.Drawing.Point(10, 134)
         Me.AppBarSizeTB.Name = "AppBarSizeTB"
         Me.AppBarSizeTB.Size = New System.Drawing.Size(62, 20)
         Me.AppBarSizeTB.TabIndex = 4
-        Me.AppBarSizeTB.Text = "75"
+        Me.AppBarSizeTB.Text = "40"
         Me.AppBarSizeTB.Visible = False
         '
         'CTrancparency

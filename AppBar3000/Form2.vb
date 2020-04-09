@@ -52,7 +52,7 @@ Public Class Settings
         End If
 
         If AppBarSizeTB.Text = "" Then
-            AppBarSizeTB.Text = "75"
+            AppBarSizeTB.Text = "40"
         Else
             AppBar3000.AppBarSize = AppBarSizeTB.Text
         End If
@@ -66,8 +66,8 @@ Public Class Settings
 
     Private Sub Settings_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
-        AppBarSizeTB.Visible = False
-        Label2.Visible = False
+        AppBarSizeTB.Visible = True
+        Label2.Visible = True
         If AppBar3000.TBar = 0 Then
             CTrancparency.Checked() = False
             R90.Enabled = False
