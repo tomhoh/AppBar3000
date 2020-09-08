@@ -5,9 +5,6 @@
     <Setting Name="AppBarPosition" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
-    <Setting Name="AppBarSize" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">75</Value>
-    </Setting>
     <Setting Name="MonNum" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">0</Value>
     </Setting>
@@ -19,6 +16,12 @@
     </Setting>
     <Setting Name="TBarValue" Type="System.Decimal" Scope="User">
       <Value Profile="(Default)">0.9</Value>
+    </Setting>
+    <Setting Name="AppBarSize" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">50</Value>
+    </Setting>
+    <Setting Name="Webaddress" Type="System.String" Scope="User">
+      <Value Profile="(Default)">www.apple.com</Value>
     </Setting>
   </Settings>
 </SettingsFile>
