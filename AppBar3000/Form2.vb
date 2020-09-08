@@ -181,4 +181,11 @@ Public Class Settings
 
     End Sub
 
+    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+        AdvancedSettings.Show()
+    End Sub
+
+    Private Sub SettingsCancelButton_Click(sender As Object, e As EventArgs) Handles SettingsCancelButton.Click
+        Me.Close()
+    End Sub
 End Class

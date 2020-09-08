@@ -1,6 +1,7 @@
 ﻿Imports System.IO
 Imports System.Runtime.InteropServices
 
+
 Public Class AppBar3000
     Public MonNum As Integer
     Public AppBarPosition As Integer
@@ -16,6 +17,8 @@ Public Class AppBar3000
     Public TBarValue As Decimal
     Public DeletedBox As String
     Public DeletedBoxName As Object
+    Public CurrentMonitor As Integer
+
 
     Private Structure RECT
 
@@ -132,7 +135,7 @@ Public Class AppBar3000
         PBNum = 0
         Me.Visible = False
         SettingsPB.Visible = False
-        ClosePB.Visible = False
+        ClosePB.Visible = True
         CheckSettings()
         Me.FormBorderStyle = FormBorderStyle.FixedToolWindow
         RegisterBar()
@@ -141,12 +144,13 @@ Public Class AppBar3000
         Me.Invalidate()
         LoadShortcuts()
         CmsMenu()
+
     End Sub
 
     Public Sub CmsMenu()
         Dim Cms1 = New ContextMenuStrip
         Dim Menu1Item1 = Cms1.Items.Add("Settings")
-        Dim Menu1Item2 = Cms1.Items.Add("Exit")
+        ' Dim Menu1Item2 = Cms1.Items.Add("Exit")
 
         Dim Cms2 = New ContextMenuStrip
         Dim Menu2Item1 = Cms2.Items.Add("Remove")
@@ -160,7 +164,8 @@ Public Class AppBar3000
     End Sub
 
     Private Sub RemoveToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RemoveToolStripMenuItem.Click
-        DeletedBoxName.Dispose
+        Form1FlowLayoutPanel1.Controls.Remove(DeletedBoxName)
+
         RemoveShortcut(DeletedBox)
     End Sub
     Public Sub SetTransparency()
@@ -278,6 +283,8 @@ Public Class AppBar3000
 
             ABSetPos()
         Else
+            'abd.cbSize = Marshal.SizeOf(abd)
+            abd.cbSize = 0
             SHAppBarMessage(CType(ABMsg.ABM_REMOVE, Integer), abd)
             fBarRegistered = False
         End If
@@ -379,10 +386,10 @@ Public Class AppBar3000
     Private Sub SettingsLoc()
 
         If AppBarPosition = 0 Then
-            SettingsPB.Location = New Point(Me.Size.Width - 15, 20)
+            SettingsPB.Location = New Point(Me.Size.Width - 150, 20)
             ClosePB.Location = New Point(Me.Size.Width - 15, 0)
             Form1FlowLayoutPanel1.Location = New Point(0, 0)
-            Form1FlowLayoutPanel1.Size = New Point(Me.Size.Width - 75, AppBarSize)
+            Form1FlowLayoutPanel1.Size = New Point(Me.Size.Width - (Me.Size.Width * 0.5), AppBarSize)
             Form1FlowLayoutPanel1.FlowDirection = FlowDirection.LeftToRight
         ElseIf AppBarPosition = 1 Then
             SettingsPB.Location = New Point(Me.Size.Width - 15, 20)
@@ -471,8 +478,11 @@ Public Class AppBar3000
         If RClick = 1 Then
             'DirectCast(sender, PictureBox).Dispose()
             RClick = 0
+
+            'DeletedBox = DirectCast(sender, PictureBox).Tag.ToString
             DeletedBox = DirectCast(sender, PictureBox).Tag.ToString
-            DeletedBoxName = DirectCast(sender, PictureBox).Name.ToString
+            'DeletedBoxName = DirectCast(sender, PictureBox).Name.ToString
+            DeletedBoxName = sender
             'RemoveShortcut(DirectCast(sender, PictureBox).Tag.ToString)
         End If
 
@@ -500,6 +510,44 @@ Public Class AppBar3000
 
         Me.Close()
 
+
     End Sub
 
+    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+        Dim frmCollection = System.Windows.Forms.Application.OpenForms
+        If frmCollection.OfType(Of Form3).Any Then
+            If Form3.Visible = True Then
+                frmCollection.Item("Form3").Hide()
+            Else
+                frmCollection.Item("Form3").Show()
+            End If
+
+        Else
+            ''Dim newForm2 = New Form2
+
+            Form3.Show()
+        End If
+
+    End Sub
+
+    Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
+        Dim frmCollection = System.Windows.Forms.Application.OpenForms
+        If frmCollection.OfType(Of Web).Any Then
+            If Web.Visible = True Then
+                frmCollection.Item("Web").Hide()
+            Else
+                frmCollection.Item("Web").Show()
+            End If
+
+        Else
+            ''Dim newForm2 = New Form2
+
+            Web.Show()
+        End If
+
+    End Sub
+
+    Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Labels.Click
+        'Web2.Show()
+    End Sub
 End Class
